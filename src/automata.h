@@ -1,12 +1,13 @@
 #ifndef __AUTOMATA_H
 #define __AUTOMATA_H
 
-#define DEFAULT_SIZE 200
+#define CA_DEF_SIZE 200
+#define CA_MIN_SIZE 50
+#define CA_MAX_SIZE 1000
 
-
-Cell {
+class Cell {
 	
-}
+};
 
 
 class CA {
@@ -15,7 +16,7 @@ class CA {
 		
 		
 	public:
-		CA(int size=DEFAULT_SIZE);
+		CA(int size=CA_DEF_SIZE);
 		~CA();
 		void run();
 		

@@ -19,9 +19,8 @@ $(NAME): $(OBJS)
 %.o: %.cpp %.h
 	$(CPP) $(CXXFLAGS) -c $< -o $@
 
-
 run: $(NAME)
-	./simulator
+	./$(NAME)
 
 clean:
 	rm -f *.o && cd ./src/ && rm -f *.o
@@ -29,6 +28,7 @@ clean:
 	rm -f tests/*.csv
 
 zip:
+	make clean
 	zip -r 07_xzales12_xmosko04.zip ./
 
 tests: 
