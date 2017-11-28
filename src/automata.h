@@ -38,7 +38,7 @@ typedef struct{
     double fuelMineralTot;
     double fuelMineralEff;
     double windSpeed;
-    double terain
+    double terain;
 } Cell;
 
 typedef struct{
@@ -49,7 +49,8 @@ typedef struct{
 class CA {
     private:
         int size;
-        
+        std::list<cellF>cellFront;
+        Cell** array;
         
     public:
         CA(int size=CA_DEF_SIZE);
