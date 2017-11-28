@@ -61,9 +61,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
-    CA* ptr = new CA(CA_size);
-        delete ptr;  
+    CA(CA_size);    
     
     return EXIT_SUCCESS;
 }
