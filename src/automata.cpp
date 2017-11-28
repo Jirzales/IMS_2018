@@ -1,7 +1,5 @@
-#include <cstdio>
-#include "automata.h"
-#include <iostream>
 
+#include "automata.h"
 
 CA::CA(int size) {
 	this->size = size;
