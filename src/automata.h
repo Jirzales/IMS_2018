@@ -24,10 +24,15 @@
     } while (0);
 
 typedef enum{
-    nonignited, fire, burned, nonflammable 
+    NONIGNITED, 
+    FIRE, 
+    BURNED, 
+    NONFLAMMABLE 
 } cellType;
 
 typedef struct{
+    int x;
+    int y;
     cellType type;
     double fuelLoad;
     double fuelDepth;
@@ -49,14 +54,16 @@ typedef struct{
 class CA {
     private:
         int size;
-        std::list<cellF>cellFront;
+        std::list<cellF>cell_front;
         Cell** array;
+
+        void addToFront();
         
     public:
         CA(int size=CA_DEF_SIZE);
         ~CA();
-        void run();
-        
+
+        int run(int time, int exportTime);
         int get_size();
 
 };

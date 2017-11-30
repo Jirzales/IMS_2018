@@ -17,12 +17,13 @@ void print_help( void );
 
 
 int main(int argc, char *argv[]) {
-
-
+    
     /******************** Arguments processing ********************/    
-    int opt_index,
+    int opt_index, 
+        time,
         c,
-        _errno;
+        _errno,
+        fire_end = 0;
     char *strtol_err = nullptr;
 
     while(1) {
@@ -30,10 +31,11 @@ int main(int argc, char *argv[]) {
         static struct option long_options[] = {
             { "help", no_argument,       0, 'h'},
             { "size", required_argument, 0, 's'},
+            { "time", required_argument, 0, 't'},
             {0, 0, 0, 0}
         };  
         
-        c = getopt_long(argc, argv, "hs:", long_options, &opt_index);
+        c = getopt_long(argc, argv, "hs:t:", long_options, &opt_index);
         
         if (c == -1)
             break;
@@ -48,10 +50,17 @@ int main(int argc, char *argv[]) {
                 _errno = errno;
 
                 if (*strtol_err != '\0')
-                    ERROR("strtol",1);
+                    ERROR("Size must be integer",1);
                 if (CA_size < CA_MIN_SIZE || CA_size > CA_MAX_SIZE || _errno == ERANGE)
                     ERROR("Wrong size!",1);
 
+                break;
+
+            case 't':
+                time = strtol(optarg, &strtol_err, 10);
+                if (*strtol_err != '\0') {
+                    ERROR("Time must be integer",1);
+                }
                 break;
 
             case '?':
@@ -61,14 +70,18 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    CA(CA_size);    
+    CA *automata = new CA(CA_size); 
+    fire_end = automata->run(time, -1);
+    if (fire_end != 0){
+        cout << "The fire burned out before the time limit. Time: " << fire_end << endl;
+    }
     
     return EXIT_SUCCESS;
 }
 
 
 void print_help() {
-    std::cout << "usage: simulator [-h] [-s <CA size>]\n";
+    std::cout << "usage: simulator [-h] [-s <CA size>] [-t <CA time>]\n";
 }
 
 
