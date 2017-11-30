@@ -75,6 +75,7 @@ int main(int argc, char *argv[]) {
     if (fire_end != 0){
         cout << "The fire burned out before the time limit. Time: " << fire_end << endl;
     }
+    delete automata;
     
     return EXIT_SUCCESS;
 }
