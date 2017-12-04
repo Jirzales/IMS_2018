@@ -6,13 +6,15 @@
 #include <algorithm>
 #include <list>
 
+#include "equations.h"
 
 #define CA_DEF_SIZE 200
 #define CA_MIN_SIZE 50
 #define CA_MAX_SIZE 1000
 
+
 /*  Macro pro chybova hlaseni
-*   @param Text chybonve hlasky
+*   @param Text chybove hlasky
 *   @param Navratovy kod chyby
 */
 #define ERROR(msg, ret) do {                            \
@@ -21,7 +23,7 @@
         fprintf(stderr, "ERROR: %s", msg);              \
         perror(" ");                                    \
         exit(ret);                                      \
-    } while (0);
+    } while (0)
 
 typedef enum{
     NONIGNITED, 
@@ -30,20 +32,21 @@ typedef enum{
     NONFLAMMABLE 
 } cellType;
 
-typedef struct{
+typedef struct Cell{
     int x;
     int y;
     cellType type;
-    double fuelLoad;
-    double fuelDepth;
-    double fuelHeat;
-    double fuelMoisture;
-    double fuelMoistExt;
-    double ovendry;
-    double fuelMineralTot;
-    double fuelMineralEff;
+    double load;
+    double depth;
+	double surfaceToVolume;
+    double heatContent;
+    double moistureContent;
+    double moistureContentOfExtinction;
+    double ovendryDensity;
+    double totalMineralContent;
+    double effectiveMineralContent;
     double windSpeed;
-    double terain;
+    double slope;
 } Cell;
 
 typedef struct{
@@ -65,8 +68,14 @@ class CA {
 
         int run(int time, int exportTime);
         int get_size();
-
+		
+		// test functions
+		void test_function();
+		
 };
+
+
+
 
 
 #endif

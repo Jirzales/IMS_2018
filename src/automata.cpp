@@ -1,4 +1,3 @@
-
 #include "automata.h"
 
 CA::CA(int size) {
@@ -35,17 +34,18 @@ int CA::run(int time, int export_time){
     a.x = 50;
     a.y = 50;
     a.type = FIRE;
-    a.fuelLoad = 0;
-    a.fuelDepth = 0;
-    a.fuelHeat = 0;
-    a.fuelMoisture = 0;
-    a.fuelMoistExt = 0;
-    a.ovendry = 0;
-    a.fuelMineralTot = 0;
-    a.fuelMineralEff = 0;
-    a.windSpeed = 0;
-    a.terain = 0;
-    element.cell = &a; //Prvni bunka pozaru
+    a.load = 0;							// W0
+    a.depth = 0;						// DELTA
+	a.surfaceToVolume = 0;				// SIGMA
+    a.heatContent = 0;					// h
+    a.moistureContent = 0;				// Mf
+    a.moistureContentOfExtinction = 0;	// Mx
+    a.ovendryDensity = 0;				// Pp
+    a.totalMineralContent = 0;			// St
+    a.effectiveMineralContent = 0;		// Se
+    a.windSpeed = 0;					// -
+    a.slope = 0;						// -
+    element.cell = &a; 					// Prvni bunka pozaru
 
     cell_front.push_back(element);
 
@@ -89,5 +89,64 @@ int CA::run(int time, int export_time){
     }
     return 0;
 }
+
+void CA::test_function() {
+	Cell cell;
+	cell.load = 10.;						// W)
+	cell.depth = 25.;						// DELTA
+    cell.x = 51;
+    cell.y = 51;
+    cell.type = FIRE;
+	cell.surfaceToVolume = 8.;				// SIGMA
+    cell.heatContent = 1.5;					// h
+    cell.moistureContent = 0.1;				// Mf
+    cell.moistureContentOfExtinction = 0.01;// Mx
+    cell.ovendryDensity = 30.;				// Pp
+    cell.totalMineralContent = 0.001;		// St
+    cell.effectiveMineralContent = 20.;		// Se
+    cell.windSpeed = 0;						// -
+    cell.slope = 0;							// -
+
+	// test cases
+	std::cout.precision(17);
+	std::cout << "result:  ";
+	//std::cout << CA_Pb(cell) << std::endl;
+	//std::cout << CA_BETA(cell) << std::endl;
+	//std::cout << CA_Qig(cell) << std::endl;
+	//std::cout << CA_EPSILON(cell) << std::endl;
+	//std::cout << CA_ETA_S(cell) << std::endl;
+	//std::cout << CA_ETA_M(cell) << std::endl;
+	//std::cout << CA_BETAop(cell) << std::endl;
+	//std::cout << CA_GAMMAmax(cell) << std::endl;
+	//std::cout << CA_GAMMA(cell) << std::endl;
+	//std::cout << CA_IR(cell) << std::endl;
+	//std::cout << CA_R(cell) << std::endl;
+	//std::cout << CA_Wn(cell) << std::endl;
+
+	//std::cout << A(cell) << std::endl;
+	//std::cout << B(cell) << std::endl;
+	//std::cout << C(cell) << std::endl;
+	//std::cout << E(cell) << std::endl;
+
+	std::cout << CA_IR(cell) << std::endl;
+
+
+	return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
