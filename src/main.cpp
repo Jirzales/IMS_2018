@@ -5,6 +5,7 @@
 #include <getopt.h>
 
 #include "automata.h"
+#include "equations.h"
 
 using namespace std;
 
@@ -29,9 +30,11 @@ int main(int argc, char *argv[]) {
     while(1) {
         
         static struct option long_options[] = {
-            { "help", no_argument,       0, 'h'},
-            { "size", required_argument, 0, 's'},
-            { "time", required_argument, 0, 't'},
+            { "help" , no_argument,       0, 'h'},
+            { "size" , required_argument, 0, 's'},
+            { "time" , required_argument, 0, 't'},
+            { "wind" , required_argument, 0, 'w'},
+            { "slope", required_argument, 0, 'x'},
             {0, 0, 0, 0}
         };  
         
@@ -62,9 +65,24 @@ int main(int argc, char *argv[]) {
                     ERROR("Time must be integer",1);
                 }
                 break;
+/*
+            case 'w':
+                time = strtol(optarg, &strtol_err, 10);
+                if (*strtol_err != '\0') {
+                    ERROR("Time must be integer",1);
+                }
+                break;
+            
+			case 'x':
+                time = strtol(optarg, &strtol_err, 10);
+                if (*strtol_err != '\0') {
+                    ERROR("Time must be integer",1);
+                }
+                break;
+  */
 
-            case '?':
-            default:
+			case '?':
+			default:
                 print_help();
                 return 1;
         }
@@ -76,6 +94,28 @@ int main(int argc, char *argv[]) {
         cout << "The fire burned out before the time limit. Time: " << fire_end << endl;
     }
     delete automata;
+
+
+
+
+	automata->test_function();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     return EXIT_SUCCESS;
 }
