@@ -1,6 +1,6 @@
 #include "automata.h"
 
-CA::CA(int size) {
+CA::CA(int size, double cell_size) {
     this->size = size;
 
     // Vytvoreni pole
@@ -10,6 +10,7 @@ CA::CA(int size) {
     }
 
     this->array = array;
+    set_distance(cell_size);
 }
 
 
@@ -48,6 +49,7 @@ int CA::run(int time, int export_time){
     element.cell = &a; 					// Prvni bunka pozaru
 
     cell_front.push_back(element);
+    double deltaT = get_deltaT(cell_front);
 
     // Hlavni cyklus krokovani
     while(true) {
@@ -68,6 +70,8 @@ int CA::run(int time, int export_time){
             if (step == time) {
                 return 0;
             }
+
+            deltaT = get_deltaT(cell_front);
         }
         // Vyhozeni pouzite nastene bunky z fronty
         cell_front.pop_front();
@@ -75,11 +79,14 @@ int CA::run(int time, int export_time){
         // Okoli horici bunky
         for(int j = -1; j < 2; j++){
             for(int i = -1; i < 2; i++){
+                pom.cell = &(array[element.cell->x + i][element.cell->y + j]);
 
-                // Zde zpracovani okolnich bunek
+                if (pom.cell->type == NONIGNITED){
+                    fire_expand(CA_Ro(element.cell), deltaT, i, j, pom.cell);
+                }
 
                 //array[element.cell.x + i][element.cell.y + j] okoli soucasne bunky
-                if((pom.cell = &(array[element.cell->x + i][element.cell->y + j]))->type == FIRE){
+                if(pom.cell->type == FIRE){
                     pom.id = step + 1;
                     cell_front.push_back(pom); // Ulozeni horici bunky
                 }
@@ -133,12 +140,66 @@ void CA::test_function() {
 	return;
 }
 
-void CA::set_distance(float dist){
+void CA::set_distance(double dist){
     for (int i = 0; i < 8; i++){
         distance[i] = (i == 0 || i == 2 || i == 5 || i == 7) ? hypot(dist, dist) : dist;
     }
 }
 
+double CA::get_deltaT(std::list<cellF> front){
+    double ro = 0;
+    double pom;
+
+    while (!front.empty()){
+        if ((pom = CA_Ro(front.front()->cell)) > ro){
+            ro = pom;
+        }
+        front.pop_front();
+    }
+
+    return CA_cell_size / ro;
+}
+
+void CA::fire_expand(double ro, double deltaT, int x, int y, Cell& cell){
+    switch(x){
+        case -1:
+            switch(y){
+                case -1:
+                    cell.fire[0] += ro * deltaT;
+                    return;
+                case 0:
+                    cell.fire[1] += ro * deltaT;
+                    return;
+                case 1:
+                    cell.fire[2] += ro * deltaT;
+                    return;
+
+            }
+        case 0:
+            switch(y){
+                case -1:
+                    cell.fire[3] += ro * deltaT;
+                    return;
+                case 1:
+                    cell.fire[4] += ro * deltaT;
+                    return;
+                
+            }
+        case 1:
+            switch(y){
+                case -1:
+                    cell.fire[5] += ro * deltaT;
+                    return;
+                case 0:
+                    cell.fire[6] += ro * deltaT;
+                    return;
+                case 1:
+                    cell.fire[7] += ro * deltaT;
+                    return;
+                
+            }
+    }
+}
 
 
 

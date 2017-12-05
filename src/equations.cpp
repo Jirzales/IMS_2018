@@ -104,6 +104,7 @@ double A ( Cell& cell, double eps) {
 double B ( Cell& cell ) {
 	return (0.0133 * pow(cell.surfaceToVolume, 0.54));
 }
+double C ( Cell& cell ) {
 	return (7.47 * exp(-0.0693 * pow(cell.surfaceToVolume, 0.55)));
 }
 double E ( Cell& cell ) {

@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    CA *automata = new CA(CA_size); 
+    CA *automata = new CA(CA_size, CA_cell_size); 
     fire_end = automata->run(CA_time, -1);
 
     if (fire_end != 0){
