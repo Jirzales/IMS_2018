@@ -1,5 +1,7 @@
 #include "equations.h"
 
+extern double CA_eccentricity;
+extern double CA_wind_speed;
 
 /**
  * This tree show dependencies of all formulas, equations
@@ -112,7 +114,11 @@ double E ( Cell& cell ) {
 
 // main output functions used mainly to evaluate 'rate of spread' (R) parameter
 
-double CA_rate_of_spread(Cell& cell, double eps) {
+double CA_rate_of_spread_eccentricity(Cell& cell) {
+	return CA_Ro(cell) * ((1 - CA_eccentricity) / (1 - (CA_eccentricity * CA_wind_speed)));
+}
+
+double CA_rate_of_spread_nowind(Cell& cell, double eps) {
 	return ( (CA_IR(cell) * CA_Xi(cell)) / 
 			CHECK_MIN(CA_Pb(cell) * CA_EPSILON(cell) * CA_Qig(cell), eps) );
 }
@@ -130,7 +136,8 @@ double CA_optimum_packing_ratio(Cell& cell) {
 }
 
 double CA_propagating_flux_ratio(Cell& cell, double eps) {
-	return ( exp((0.792 + (0.376  * pow(cell.surfaceToVolume, 0.5))) * (CA_BETA(cell) + 0.1)) / CHECK_MIN(192. + (0.0791 * cell.surfaceToVolume), eps) );
+	return ( exp((0.792 + (0.376  * pow(cell.surfaceToVolume, 0.5))) * (CA_BETA(cell) + 0.1)) / 
+			CHECK_MIN(192. + (0.0791 * cell.surfaceToVolume), eps) );
 }
 
 double CA_maximum_reaction_velocity(Cell& cell) {
@@ -170,5 +177,35 @@ double CA_effective_heating_number(Cell& cell, double eps) {
 double CA_heat_of_preignition(Cell& cell) {
 	return ( 522. + (2332. * cell.moistureContent) );
 }
+
+
+
+// U.S. standard versions for different wind speed in mid-height of 6.1m [m/s]
+
+double CA_length_to_width__USstandard27(double wind_speed) {
+	return 1.0 + (0.00452 * pow(wind_speed, 2.154));
+}
+double CA_length_to_width__USstandard27_2(double wind_speed) {
+	return 0.5 + 0.5 * exp(0.09326 * wind_speed);
+}
+double CA_length_to_width__USstandard25(double wind_speed) {
+	return exp(0.11626 * pow(wind_speed, 0.86559));
+}
+double CA_length_to_width__USstandard1(double wind_speed) {
+	return 1.46 * pow(wind_speed, 0.464);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

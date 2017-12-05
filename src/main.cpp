@@ -14,9 +14,9 @@ using namespace std;
 int CA_size = CA_DEF_SIZE,	// Width/height of Cellular automaton's lattice
 	CA_cell_size = CA_DEF_CELL_SIZE,	// automaton's cell size [m]
     CA_time = CA_DEF_TIME,	// simulation time [min]
-	CA_wind_speed = 0,		// wind speed [m/s]
-	CA_wind_angle = 0;		// angle of wind [deg]
-
+	CA_wind_speed,		// wind speed [m/s]
+	CA_wind_angle,		// angle of wind [deg]
+	CA_eccentricity;		// eccentricity of elliptic shape of fire spread
 
 // function prototypes
 void print_help( void );
