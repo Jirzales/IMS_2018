@@ -104,7 +104,6 @@ double A ( Cell& cell, double eps) {
 double B ( Cell& cell ) {
 	return (0.0133 * pow(cell.surfaceToVolume, 0.54));
 }
-double C ( Cell& cell ) {
 	return (7.47 * exp(-0.0693 * pow(cell.surfaceToVolume, 0.55)));
 }
 double E ( Cell& cell ) {
@@ -194,6 +193,7 @@ double CA_length_to_width__USstandard25(double wind_speed) {
 double CA_length_to_width__USstandard1(double wind_speed) {
 	return 1.46 * pow(wind_speed, 0.464);
 }
+
 
 
 
