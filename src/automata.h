@@ -47,6 +47,7 @@ typedef struct Cell{
     double effectiveMineralContent;
     double windSpeed;
     double slope;
+    double fire[8];
 } Cell;
 
 typedef struct{
@@ -58,9 +59,10 @@ class CA {
     private:
         int size;
         std::list<cellF>cell_front;
+        std::list<cellF>cell_front_nonig;
+        double distance[8];
         Cell** array;
-
-        void addToFront();
+        void set_distance(float dist);
         
     public:
         CA(int size=CA_DEF_SIZE);

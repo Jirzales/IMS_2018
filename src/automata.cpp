@@ -134,6 +134,11 @@ void CA::test_function() {
 	return;
 }
 
+void CA::set_distance(float dist){
+    for (int i = 0; i < 8; i++){
+        distance[i] = (i == 0 || i == 2 || i == 5 || i == 7) ? hypot(dist, dist) : dist;
+    }
+}
 
 
 

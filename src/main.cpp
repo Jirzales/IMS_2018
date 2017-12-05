@@ -95,28 +95,8 @@ int main(int argc, char *argv[]) {
     }
     delete automata;
 
-
-
-
 	automata->test_function();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
     return EXIT_SUCCESS;
 }
 
