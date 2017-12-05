@@ -36,3 +36,16 @@ tests:
 
 doc:
 	@echo Documentation not available yet!
+
+# show help page of Makefile
+help:
+	@echo 
+	@echo 
+	@echo 
+	@echo 
+	@echo 
+	@echo 
+	@echo 
+	@echo 
+	@echo 
+	@echo 

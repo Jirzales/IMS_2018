@@ -8,9 +8,11 @@
 
 #include "equations.h"
 
-#define CA_DEF_SIZE 200
-#define CA_MIN_SIZE 50
-#define CA_MAX_SIZE 1000
+#define CA_DEF_SIZE 200		// default number of automaton's rows and columns
+#define CA_DEF_TIME 1000	// default simulation time [min]
+#define CA_MIN_SIZE 50		// MINimal number of cells in row/col
+#define CA_MAX_SIZE 1000	// MAXimal number of cells in row/col
+#define CA_DEF_CELL_SIZE 10	// default size of each cell's side
 
 
 /*  Macro pro chybova hlaseni
