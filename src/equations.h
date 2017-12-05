@@ -72,6 +72,11 @@ double CA_reaction_intensity			(Cell& cell);
 double CA_effective_heating_number		(Cell& cell, double eps=EPS);
 double CA_heat_of_preignition			(Cell& cell);
      
+// equations for computing eccentricity of fire/elipse spread shape
+double CA_
+double CA_`
+
+
 
 
 

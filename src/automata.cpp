@@ -44,7 +44,7 @@ int CA::run(int time, int export_time){
     a.totalMineralContent = 0;			// St
     a.effectiveMineralContent = 0;		// Se
     a.windSpeed = 0;					// -
-    a.slope = 0;						// -
+    //a.slope = 0;						// -
     element.cell = &a; 					// Prvni bunka pozaru
 
     cell_front.push_back(element);
@@ -92,20 +92,19 @@ int CA::run(int time, int export_time){
 
 void CA::test_function() {
 	Cell cell;
-	cell.load = 10.;						// W)
-	cell.depth = 25.;						// DELTA
+	cell.load = 1.08;						// W)
+	cell.depth = 1.;						// DELTA
     cell.x = 51;
     cell.y = 51;
     cell.type = FIRE;
-	cell.surfaceToVolume = 8.;				// SIGMA
+	cell.surfaceToVolume = 5000;			// SIGMA
     cell.heatContent = 1.5;					// h
-    cell.moistureContent = 0.1;				// Mf
-    cell.moistureContentOfExtinction = 0.01;// Mx
-    cell.ovendryDensity = 30.;				// Pp
+    cell.moistureContent = 0.09;			// Mf
+    cell.moistureContentOfExtinction = 0.3;// Mx
+    cell.ovendryDensity = 40.;				// Pp
     cell.totalMineralContent = 0.001;		// St
     cell.effectiveMineralContent = 20.;		// Se
-    cell.windSpeed = 0;						// -
-    cell.slope = 0;							// -
+    //cell.slope = 10.;						
 
 	// test cases
 	std::cout.precision(17);
@@ -120,7 +119,7 @@ void CA::test_function() {
 	//std::cout << CA_GAMMAmax(cell) << std::endl;
 	//std::cout << CA_GAMMA(cell) << std::endl;
 	//std::cout << CA_IR(cell) << std::endl;
-	//std::cout << CA_R(cell) << std::endl;
+	std::cout << CA_R(cell) << std::endl;
 	//std::cout << CA_Wn(cell) << std::endl;
 
 	//std::cout << A(cell) << std::endl;
@@ -128,7 +127,7 @@ void CA::test_function() {
 	//std::cout << C(cell) << std::endl;
 	//std::cout << E(cell) << std::endl;
 
-	std::cout << CA_IR(cell) << std::endl;
+	//std::cout << CA_IR(cell) << std::endl;
 
 
 	return;
