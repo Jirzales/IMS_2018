@@ -116,7 +116,8 @@ double E ( Cell& cell ) {
 /********************************************  main output functions used mainly to evaluate 'rate of spread' (R) parameter ************************************************/
 
 double CA_rate_of_spread_eccentricity(Cell& cell, double radians) {
-	return CA_Ro(cell) * ((1 - CA_eccentricity) / (1 - (CA_eccentricity * cos(fabs(radians - CA_wind_angle)))));
+	//return CA_Ro(cell) * ((1 - CA_eccentricity) / (1 - (CA_eccentricity * cos(fabs(radians - CA_wind_angle)))));
+	return RO_TR * ((1 - CA_eccentricity) / (1 - (CA_eccentricity * cos(fabs(radians - CA_wind_angle)))));
 }
 
 double CA_rate_of_spread_nowind(Cell& cell, double eps) {
@@ -188,7 +189,6 @@ double CA_heat_of_preignition(Cell& cell) {
 // U.S. standard versions for different wind speed in mid-height of 6.1m [m/s]
 
 double CA_LW__USstandard27(double wind_speed) {		// less than 12.07 m/s
-std::cout << "winddddd -- " << wind_speed << std::endl;
 	return 1.0 + (0.00452 * pow(wind_speed / 0.277777, 2.154));
 }
 double CA_LW__USstandard27_2(double wind_speed) {	// less than 12.07 m/s
@@ -204,13 +204,13 @@ double CA_LW__USstandard1(double wind_speed) {		// greater than 0.447 m/s
 // versions used for different density and/or type of fuels
 
 double CA_LW__dense_forest(double wind_speed) {		// used for dense forest
-	return (0.936 * exp(0.04464 * wind_speed) * 0.461 * exp(-0.02693 * wind_speed));
+	return (0.936 * exp(0.04464 * wind_speed) + 0.461 * exp(-0.02693 * wind_speed));
 }
 double CA_LW__open_forest(double wind_speed) {		// used for open forests
-	return (0.936 * exp(0.007 * wind_speed) * 0.461 * exp(-0.04032 * wind_speed));
+	return (0.936 * exp(0.007 * wind_speed) + 0.461 * exp(-0.04032 * wind_speed));
 }
 double CA_LW_light_fuels(double wind_speed) {		// used for grass, low/medium slash, leafless hardwood stands
-	return (0.936 * exp(0.1607 * wind_speed) * 0.461 * exp(-0.05364 * wind_speed));
+	return (0.936 * exp(0.1607 * wind_speed) + 0.461 * exp(-0.05364 * wind_speed));
 }
 
 // other equations gained through experiments
@@ -223,19 +223,18 @@ double CA_LW__McArthur(double wind_speed) {
 // function which automatically choose best function for evaluating length-to-width
 // based upon all relevant CA parameters
 double CA_LW() {
-std::cout << "\n\nwhaaaat--- " << CA_LW__USstandard27(CA_wind_speed) << std::endl;
-	return CA_LW__dense_forest(CA_wind_speed);
+	return CA_LW__open_forest (CA_wind_speed);		// used for open forests
+
 	if (CA_wind_speed != 0) {
 		// use universal equation for winds faster than 12.07 m/s
-		if (CA_wind_speed > 11.176 ) {
+		if (CA_wind_speed > 11.176 )
 			return CA_LW__USstandard1(CA_wind_speed);
-		} 
-		else if (CA_wind_speed > 0.447 ) {
+		else if (CA_wind_speed > 0.447 )
 			return CA_LW__USstandard1(CA_wind_speed);
-		} else {
+		else 
 			return CA_LW__McArthur(CA_wind_speed);
-		}
 	}
+
 	// no-wind conditions 
 	else {
 		// you can set there any value from above US standard values depending on fuel type
@@ -243,7 +242,6 @@ std::cout << "\n\nwhaaaat--- " << CA_LW__USstandard27(CA_wind_speed) << std::end
 			return CA_LW__McArthur(CA_wind_speed);
 		}
 	}
-
 }
 
 // return eccentricity

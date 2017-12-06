@@ -3,7 +3,7 @@ import sys
 
 from PIL import Image
  
-name = 'test3'
+name = 'test6'
 
 im = Image.open('resources/'+name+'.jpg') #relative path to file
  
@@ -31,7 +31,7 @@ with open('tests/'+name+'.csv', 'w+') as f:
       #b = hex(pix[x,y][2]).split('x')[-1].zfill(3)
       #f.write('#{0}{1}{2}, '.format(r,g,b))
       f.write('{0},{1},{2},'.format(r,g,b))
-    #f.write('\n')
+    f.write('\n')
   f.write('\n')
 
 print(name+'.csv of size '+str(width)+'x'+str(height)+' has been created and put into TESTS directory!\n')

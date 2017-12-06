@@ -56,8 +56,6 @@ typedef struct Cell{
     double ovendryDensity;
     double totalMineralContent;
     double effectiveMineralContent;
-    double windSpeed;
-    double slope;
     double fire[8] = {0,};
 } Cell;
 
@@ -87,7 +85,7 @@ class CA {
         ~CA();
 
 		void get_image_of_fire(int w, int h, char *name); 
-        int run(int time, int exportTime);
+        int run();
         int get_size();
         
         // test functions
@@ -95,7 +93,7 @@ class CA {
         
 };
 
-int random_range(int min, int max);
+int rndm();
 
 
 

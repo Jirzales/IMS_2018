@@ -140,9 +140,6 @@ int main(int argc, char *argv[]) {
 				CA_wind_angle = angles_to_radians(CA_wind_angle);
 				CA_eccentricity = CA_get_eccentricity();
 					
-				cout << "CA wind speed:\t" << CA_wind_speed<< endl;
-				cout << "CA wind angle:\t" << CA_wind_angle << endl;
-				cout << "CA eccentricity:\t" << CA_eccentricity << endl;
 				break;
             
 		case '?':
@@ -154,8 +151,9 @@ int main(int argc, char *argv[]) {
 
     CA *automata = new CA(csv? csv: NULL); 
 	automata->get_image_of_fire(CA_size, CA_size, "sim");
-    fire_end = automata->run(CA_time, -1);
-    if (fire_end != 0){
+   
+	fire_end = automata->run();
+	if (fire_end != 0){
         cout << "The fire burned out before the time limit. Time: " << fire_end << endl;
     }
 
