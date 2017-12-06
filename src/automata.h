@@ -54,7 +54,7 @@ typedef struct Cell{
 
 typedef struct{
     int id;
-    Cell* cell; 
+    Cell cell; 
 } cellF;
 
 class CA {
@@ -63,12 +63,14 @@ class CA {
         std::list<cellF>cell_front; // Horici bunky
         std::list<cellF>cell_front_nonig;   // Bunky pro mozne zapaleni
         double distance[8];
+        double distance_sum = 0;
         Cell** array;
 
         void set_distance(double dist);
         double get_deltaT(std::list<cellF> front);
         void fire_expand(double ro, double deltaT, int x, int y, Cell& cell);
-        
+        void cell_ingite();
+
     public:
         CA(int size, double cell_size);
         ~CA();
