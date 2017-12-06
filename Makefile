@@ -31,10 +31,6 @@ zip:
 	make clean
 	zip -r 07_xzales12_xmosko04.zip ./
 
-tests: 
-	python ./tests/image_to_csv.py $(ARGS)
-
-
 # show help page of Makefile
 help:
 	@echo ""
