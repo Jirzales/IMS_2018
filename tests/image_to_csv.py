@@ -3,7 +3,9 @@ import sys
 
 from PIL import Image
  
-im = Image.open('resources/test1.jpg') #relative path to file
+name = 'test3'
+
+im = Image.open('resources/'+name+'.jpg') #relative path to file
  
 #load the pixel info
 pix = im.load()
@@ -12,19 +14,26 @@ pix = im.load()
 width, height = im.size
  
 #open a file to write the pixel data
-with open('tests/test1.csv', 'w+') as f:
+with open('tests/'+name+'.csv', 'w+') as f:
   #stores width,height
   f.write('{0},{1}\n'.format(width,height))
  
   #read the details of each pixel and write them to the file
   for y in range(height):
     for x in range(width):
-      r = hex(pix[x,y][0]).split('x')[-1].zfill(2)
-      g = hex(pix[x,y][1]).split('x')[-1].zfill(2)
-      b = hex(pix[x,y][2]).split('x')[-1].zfill(2)
-      f.write('#{0}{1}{2}, '.format(r,g,b))
+      r = str(pix[x,y][0]).zfill(3)
+      g = str(pix[x,y][1]).zfill(3)
+      b = str(pix[x,y][2]).zfill(3)
+      
+      #r = (pix[x,y][0]).split('x')[-1].zfill(3)
+      #g = (pix[x,y][1]).split('x')[-1].zfill(3)
+      #b = (pix[x,y][2]).split('x')[-1].zfill(3)
+      #f.write('#{0}{1}{2}, '.format(r,g,b))
+      f.write('{0},{1},{2},'.format(r,g,b))
     f.write('\n')
   f.write('\n')
+
+print(name+'.csv has been created and put into TESTS directory!\n')
 
 if(len(sys.argv) > 1):
     print(sys.argv[1:])

@@ -3,6 +3,9 @@
 
 #include <cstdio>
 #include <iostream>
+#include <random>
+#include <cstring>
+#include <fstream>
 #include <algorithm>
 #include <list>
 
@@ -13,6 +16,9 @@
 #define CA_MIN_SIZE 50      // MINimal number of cells in row/col
 #define CA_MAX_SIZE 1000    // MAXimal number of cells in row/col
 #define CA_DEF_CELL_SIZE 10 // default size of each cell's side
+#define CA_DEF_FUEL_PROB 50	// default size of each cell's side
+#define CELL_MIN_SIZE 1		// minimal cell size [m]
+#define CELL_MAX_SIZE 100	// maximal cell size [m]
 
 #define RO_TR 0.02425
 #define RO_ZV 0.01865
@@ -73,9 +79,11 @@ class CA {
         double get_deltaT(std::list<cellF> front);
         void fire_expand(double ro, double deltaT, int x, int y, Cell& cell);
         void cell_ingite();
+		void initialize_CA_cells(std::ifstream& file, int width, int height);
 
     public:
-        CA(int size, double cell_size);
+        CA(char *csv);
+		CA();
         ~CA();
 
         int run(int time, int exportTime);
@@ -86,7 +94,7 @@ class CA {
         
 };
 
-
+int random_range(int min, int max);
 
 
 

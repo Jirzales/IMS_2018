@@ -188,16 +188,17 @@ double CA_heat_of_preignition(Cell& cell) {
 // U.S. standard versions for different wind speed in mid-height of 6.1m [m/s]
 
 double CA_LW__USstandard27(double wind_speed) {		// less than 12.07 m/s
-	return 1.0 + (0.00452 * pow(wind_speed, 2.154));
+std::cout << "winddddd -- " << wind_speed << std::endl;
+	return 1.0 + (0.00452 * pow(wind_speed / 0.277777, 2.154));
 }
 double CA_LW__USstandard27_2(double wind_speed) {	// less than 12.07 m/s
-	return 0.5 + 0.5 * exp(0.09326 * wind_speed);
+	return 0.5 + 0.5 * exp(0.20862 * wind_speed);
 }
 double CA_LW__USstandard25(double wind_speed) {		// less than 11.176 m/s
-	return exp(0.11626 * pow(wind_speed, 0.86559));
+	return exp(0.11626 * pow(wind_speed / 0.44704, 0.86559));
 }
 double CA_LW__USstandard1(double wind_speed) {		// greater than 0.447 m/s
-	return 1.46 * pow(wind_speed, 0.464);
+	return 1.46 * pow(wind_speed / 0.44704, 0.464);
 }
 
 // versions used for different density and/or type of fuels
@@ -222,10 +223,12 @@ double CA_LW__McArthur(double wind_speed) {
 // function which automatically choose best function for evaluating length-to-width
 // based upon all relevant CA parameters
 double CA_LW() {
-	if (CA_wind_speed) {
+std::cout << "\n\nwhaaaat--- " << CA_LW__USstandard27(CA_wind_speed) << std::endl;
+	return CA_LW__dense_forest(CA_wind_speed);
+	if (CA_wind_speed != 0) {
 		// use universal equation for winds faster than 12.07 m/s
 		if (CA_wind_speed > 11.176 ) {
-			return CA_LW__USstandard27(CA_wind_speed);
+			return CA_LW__USstandard1(CA_wind_speed);
 		} 
 		else if (CA_wind_speed > 0.447 ) {
 			return CA_LW__USstandard1(CA_wind_speed);

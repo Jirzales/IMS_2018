@@ -11,12 +11,13 @@
 using namespace std;
 
 /**** global variables *****/
-int CA_size = CA_DEF_SIZE,	// Width/height of Cellular automaton's lattice
+int CA_size = CA_DEF_SIZE,				// Width/height of Cellular automaton's lattice
 	CA_cell_size = CA_DEF_CELL_SIZE,	// automaton's cell size [m]
-    CA_time = CA_DEF_TIME,	// simulation time [min]
-	CA_wind_speed,		// wind speed [m/s]
-	CA_wind_angle,		// angle of wind [deg]
-	CA_eccentricity;		// eccentricity of elliptic shape of fire spread
+    CA_time = CA_DEF_TIME,				// simulation time [min]
+	CA_fuel_prob = CA_DEF_FUEL_PROB;	// probability [0-100%] that celltype of each cell will be NONIGNITED
+double CA_wind_speed,					// wind speed [m/s]
+       CA_wind_angle,					// angle of wind [deg]
+       CA_eccentricity;					// eccentricity of elliptic shape of fire spread
 
 // function prototypes
 void print_help( void );
@@ -33,7 +34,8 @@ int main(int argc, char *argv[]) {
         _errno,
         fire_end = 0;
     char *strtol_err = nullptr,
-	 	 *strtk;
+	 	 *strtk = nullptr,
+		 *csv = nullptr;
 
     while(1) {
         
@@ -42,12 +44,14 @@ int main(int argc, char *argv[]) {
             { "size" , required_argument, 0, 's'},
             { "cell" , required_argument, 0, 'c'},
             { "time" , required_argument, 0, 't'},
+            { "fuel" , required_argument, 0, 'f'},
             { "wind" , required_argument, 0, 'w'},
             { "slope", required_argument, 0, 'x'},
+            { "image", required_argument, 0, 'i'},
             {0, 0, 0, 0}
         };  
         
-        c = getopt_long(argc, argv, "hs:t:", long_options, &opt_index);
+        c = getopt_long(argc, argv, "hs:t:w:x:c:f:i:", long_options, &opt_index);
         
         if (c == -1)
             break;
@@ -57,6 +61,12 @@ int main(int argc, char *argv[]) {
                 print_help();
                 return EXIT_SUCCESS;
 
+            case 'i':	// --size
+                csv = optarg;
+				
+				//cout << "csv name: " << csv << endl;
+				break;
+
             case 's':	// --size
                 CA_size = strtol(optarg, &strtol_err, 0);
                 _errno = errno;
@@ -65,6 +75,8 @@ int main(int argc, char *argv[]) {
                     ERROR("Size must be integer!\n",1);
                 if (CA_size < CA_MIN_SIZE || CA_size > CA_MAX_SIZE || _errno == ERANGE)
                     ERROR("Wrong size!",1);
+
+				//cout << "CA size:\t" << CA_size<< endl;	
 				break;
 	
             case 'c':	// --cell
@@ -73,9 +85,23 @@ int main(int argc, char *argv[]) {
 
                 if (*strtol_err != '\0')
                     ERROR("Size must be integer!\n",1);
-                if (CA_size < CA_MIN_SIZE || CA_size > CA_MAX_SIZE || _errno == ERANGE)
+                if (CA_cell_size < CELL_MIN_SIZE || CA_cell_size > CELL_MAX_SIZE || _errno == ERANGE)
                     ERROR("Wrong CA size format/number!",1);
 
+				//cout << "Cell size:\t" << CA_cell_size<< endl;
+				break;
+
+            case 'f':	// --time
+                CA_fuel_prob = strtol(optarg, &strtol_err, 10);
+                _errno = errno;
+
+                if (*strtol_err != '\0') {
+                    ERROR("Time must be integer!\n",1);
+                }
+                if (CA_fuel_prob < 0 || CA_fuel_prob > 100 ||_errno == ERANGE)
+                    ERROR("Wrong range or format for fuel probability!",1);
+
+				//cout << "Probability of fuel:\t" << CA_fuel_prob << endl;
 				break;
 
             case 't':	// --time
@@ -88,6 +114,7 @@ int main(int argc, char *argv[]) {
                 if (CA_time <= 0 || _errno == ERANGE)
                     ERROR("Wrong simulation time number!",1);
 
+				//cout << "Sim. time:\t" << CA_time << endl;
 				break;
 
             case 'w':	// --wind
@@ -114,7 +141,9 @@ int main(int argc, char *argv[]) {
 				CA_wind_angle = angles_to_radians(CA_wind_angle);
 				CA_eccentricity = CA_get_eccentricity();
 					
-
+				cout << "CA wind speed:\t" << CA_wind_speed<< endl;
+				cout << "CA wind angle:\t" << CA_wind_angle << endl;
+				cout << "CA eccentricity:\t" << CA_eccentricity << endl;
 				break;
             
 /*		case 'x':	// --slope
@@ -132,9 +161,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    CA *automata = new CA(CA_size, CA_cell_size); 
+    CA *automata = new CA(csv? csv: NULL); 
     fire_end = automata->run(CA_time, -1);
-
     if (fire_end != 0){
         cout << "The fire burned out before the time limit. Time: " << fire_end << endl;
     }
@@ -147,7 +175,7 @@ int main(int argc, char *argv[]) {
 
 
 void print_help() {
-    std::cout << "usage: simulator [-h] [-s <CA size>] [-t <CA time(min)>] [-w <speed(m/s),angle(rad)>] [-c <size(m)>]\n";
+    std::cout << "usage: simulator [-h] [-s <CA size>] [-t <CA time(min)>] [-w <speed(m/s),angle(rad)>] [-c <size(m)>] [-f <0, 100>]\n";
 }
 
 

@@ -1,17 +1,68 @@
 #include "automata.h"
-int extern CA_cell_size;
 
-CA::CA(int size, double cell_size) {
-    this->size = size;
+extern int CA_cell_size;
+extern int CA_size;
+extern int CA_fuel_prob;
 
-    // Vytvoreni pole
-    Cell** array = new Cell*[size];
+using namespace std;
+
+CA::CA() {
+	std::cout << "implicit constructor called!\n"; 
+}
+
+
+CA::CA(char *csv) {
+	char buffer[256];		// name inserted through cmd line
+	int width  = CA_size, 
+		height = CA_size;
+	ifstream file;
+
+	// open input image/csv to check if height-width matches set CA size
+	if (csv != NULL) {
+		strcpy(buffer, "tests/");
+		strcat(buffer, csv);
+		file.open(buffer);	
+		if (!file.is_open())
+			ERROR("File could not be opened! Unexpected format!\n", 1);
+		
+		// get csv-image reslution
+		file.getline(buffer, 100, '\n');
+		width = atoi(strtok(buffer, ","));
+		height = atoi(strtok(NULL, ", "));
+
+		if ((width != height) && (width != CA_size))
+			ERROR("Error: input size is different from csv data size", 2);
+	}
+    this->size = width;
+
+    // allocating space for Cellular Automaton
+    Cell** array = new Cell*[this->size];
     for(int i = 0; i < size; ++i){
-        array[i] = new Cell[size];
+        array[i] = new Cell[this->size];
     }
-
     this->array = array;
-    set_distance(cell_size);
+	
+	// create random number generator for range (1, 100)
+	default_random_engine gen;
+	uniform_int_distribution<int> distribution(1,100);
+	distribution(gen);
+
+	for (int i=0; i < this->size; i++) {
+		for (int j=0; j < this->size; j++) {
+			if (distribution(gen) <= CA_fuel_prob) {
+				this->array[i][j].type = NONIGNITED;
+			}
+			else {
+				this->array[i][j].type = NONFLAMMABLE; 
+			}
+		}
+	}
+    set_distance(CA_cell_size);
+	
+	if (csv != NULL) {
+		initialize_CA_cells(file, width, height);
+		file.close();
+	}
 }
 
 
@@ -113,7 +164,7 @@ void CA::test_function() {
     cell.moistureContent = 0.09;			// Mf
     cell.moistureContentOfExtinction = 0.3;// Mx
     cell.ovendryDensity = 40.;				// Pp
-    cell.totalMineralContent = 0.001;		// St
+    cell.totalMineralContent = 0.0001;		// St
     cell.effectiveMineralContent = 20.;		// Se
     //cell.slope = 10.;						
 
@@ -125,7 +176,7 @@ void CA::test_function() {
 	//std::cout << CA_Qig(cell) << std::endl;
 	//std::cout << CA_EPSILON(cell) << std::endl;
 	//std::cout << CA_ETA_S(cell) << std::endl;
-	//std::cout << CA_ETA_M(cell) << std::endl;
+	std::cout << CA_ETA_M(cell) << std::endl;
 	//std::cout << CA_BETAop(cell) << std::endl;
 	//std::cout << CA_GAMMAmax(cell) << std::endl;
 	//std::cout << CA_GAMMA(cell) << std::endl;
@@ -233,7 +284,88 @@ void CA::cell_ingite(){
     }
 }
 
+void CA::initialize_CA_cells(std::ifstream& file, int width, int height) {
+	char R[4], G[4], B[4];
 
+	for (int i=0; i<height; i++) {
+		for (int j=0; j<width; j++) {
+			file.getline(R, 4, ',');
+			file.getline(G, 4, ',');
+			file.getline(B, 4, ',');
+			
+			if ((atoi(R) < 50) && (atoi(G) < 50) && (atoi(B) < 50))
+				this->array[i][j].type = NONFLAMMABLE;
+			else if (atoi(R) > 128 && (atoi(G) < 128) && (atoi(B) < 128))				
+				this->array[i][j].type = FIRE;
+		}	
+	}
+}
+
+
+/*void CA::get_image_of_fire(int w, int h, char *name) {
+	static int i = 0;		// counter for creating unique names of images
+	img_name[256];
+	char int_to_str[20];	// buffer for converting int to string
+	sprintf(img_name, "%d_%s", i, name);
+
+
+	FILE *f;
+	unsigned char *img = NULL;
+	int filesize = 54 + 3*w*h;  //w is your image width, h is image height, both int
+	
+	img = (unsigned char *)malloc(3*w*h);
+	memset(img,0,3*w*h);
+	
+	for(int i=0; i<w; i++)
+	{
+	    for(int j=0; j<h; j++)
+	    {
+	        x=i; y=(h-1)-j;
+	        r = red[i][j]*255;
+	        g = green[i][j]*255;
+	        b = blue[i][j]*255;
+	        if (r > 255) r=255;
+	        if (g > 255) g=255;
+	        if (b > 255) b=255;
+
+			// bmp stores colors as BGR (0,1,2 indices)
+	        img[(x+y*w)*3+2] = (unsigned char)(r);
+	        img[(x+y*w)*3+1] = (unsigned char)(g);
+	        img[(x+y*w)*3+0] = (unsigned char)(b);
+	    }
+	}
+	
+	unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
+	unsigned char bmpinfoheader[40] = {40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0, 24,0};
+	unsigned char bmppad[3] = {0,0,0};
+	
+	bmpfileheader[ 2] = (unsigned char)(filesize    );
+	bmpfileheader[ 3] = (unsigned char)(filesize>> 8);
+	bmpfileheader[ 4] = (unsigned char)(filesize>>16);
+	bmpfileheader[ 5] = (unsigned char)(filesize>>24);
+	
+	bmpinfoheader[ 4] = (unsigned char)(       w    );
+	bmpinfoheader[ 5] = (unsigned char)(       w>> 8);
+	bmpinfoheader[ 6] = (unsigned char)(       w>>16);
+	bmpinfoheader[ 7] = (unsigned char)(       w>>24);
+	bmpinfoheader[ 8] = (unsigned char)(       h    );
+	bmpinfoheader[ 9] = (unsigned char)(       h>> 8);
+	bmpinfoheader[10] = (unsigned char)(       h>>16);
+	bmpinfoheader[11] = (unsigned char)(       h>>24);
+	
+	f = fopen("img.bmp","wb");
+	fwrite(bmpfileheader,1,14,f);
+	fwrite(bmpinfoheader,1,40,f);
+	for(int i=0; i<h; i++)
+	{
+	    fwrite(img+(w*(h-i-1)*3),3,w,f);
+	    fwrite(bmppad,1,(4-(w*3)%4)%4,f);
+	}
+	
+	free(img);
+	fclose(f);	
+	
+}*/
 
 
 
