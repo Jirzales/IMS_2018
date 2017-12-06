@@ -14,6 +14,9 @@
 #define CA_MAX_SIZE 1000    // MAXimal number of cells in row/col
 #define CA_DEF_CELL_SIZE 10 // default size of each cell's side
 
+#define RO_TR 0.02425
+#define RO_ZV 0.01865
+#define RO_HL 0.012095
 
 /*  Macro pro chybova hlaseni
 *   @param Text chybove hlasky
