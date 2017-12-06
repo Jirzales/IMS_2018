@@ -182,20 +182,26 @@ double CA_heat_of_preignition(Cell& cell) {
 
 // U.S. standard versions for different wind speed in mid-height of 6.1m [m/s]
 
-double CA_length_to_width__USstandard27(double wind_speed) {
+double CA_length_to_width__USstandard27(double wind_speed) {	// less than 12.07 m/s
 	return 1.0 + (0.00452 * pow(wind_speed, 2.154));
 }
-double CA_length_to_width__USstandard27_2(double wind_speed) {
+double CA_length_to_width__USstandard27_2(double wind_speed) {	// less than 12.07 m/s
 	return 0.5 + 0.5 * exp(0.09326 * wind_speed);
 }
-double CA_length_to_width__USstandard25(double wind_speed) {
+double CA_length_to_width__USstandard25(double wind_speed) {	// less than 11.176 m/s
 	return exp(0.11626 * pow(wind_speed, 0.86559));
 }
-double CA_length_to_width__USstandard1(double wind_speed) {
+double CA_length_to_width__USstandard1(double wind_speed) {		// greater than 0.447 m/s
 	return 1.46 * pow(wind_speed, 0.464);
 }
 
+double get_LW(double wind_speed) {
+	if (wind_speed == ) {
 
+	} else if () {
+		
+	}
+}
 
 
 
