@@ -72,6 +72,8 @@ int CA::run(int time, int export_time){
                 return 0;
             }
 
+            cell_ingite(); // Zjisteni zda se ma nehorici bunka podpalit
+
             deltaT = get_deltaT(cell_front);
         }
         // Vyhozeni pouzite nastene bunky z fronty
@@ -84,6 +86,7 @@ int CA::run(int time, int export_time){
 
                 if (pom.cell.type == NONIGNITED){
                     fire_expand(CA_Ro(element.cell), deltaT, i, j, pom.cell);
+                    cell_front_nonig.push_back(pom);
                 }
 
                 //array[element.cell.x + i][element.cell.y + j] okoli soucasne bunky
@@ -144,6 +147,7 @@ void CA::test_function() {
 void CA::set_distance(double dist){
     for (int i = 0; i < 8; i++){
         distance[i] = (i == 0 || i == 2 || i == 5 || i == 7) ? hypot(dist, dist) : dist;
+        distance_sum += distance[i];
     }
 }
 
@@ -202,6 +206,29 @@ void CA::fire_expand(double ro, double deltaT, int x, int y, Cell &cell){
                     return;
                 
             }
+    }
+}
+
+void CA::cell_ingite(){
+    double cell_sum = 0;
+    Cell pom_cell;
+
+    while(!cell_front_nonig.empty()){
+        pom_cell = cell_front_nonig.front().cell;
+        for (int i = 0; i < 8; i++){
+            if (pom_cell.fire[i] > distance[i]){
+                pom_cell.type = FIRE; 
+                break;
+            }
+
+            cell_sum += pom_cell.fire[i];
+        }
+
+        if (distance_sum / 2 < cell_sum){
+            pom_cell.type = FIRE;
+        }
+
+        cell_front_nonig.pop_front();
     }
 }
 
