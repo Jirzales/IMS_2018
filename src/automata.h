@@ -54,7 +54,7 @@ typedef struct Cell{
 
 typedef struct{
     int id;
-    Cell* cell; 
+    Cell cell; 
 } cellF;
 
 class CA {

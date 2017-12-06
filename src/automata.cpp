@@ -1,4 +1,5 @@
 #include "automata.h"
+int extern CA_cell_size;
 
 CA::CA(int size, double cell_size) {
     this->size = size;
@@ -46,7 +47,7 @@ int CA::run(int time, int export_time){
     a.effectiveMineralContent = 0;		// Se
     a.windSpeed = 0;					// -
     //a.slope = 0;						// -
-    element.cell = &a; 					// Prvni bunka pozaru
+    element.cell = a; 					// Prvni bunka pozaru
 
     cell_front.push_back(element);
     double deltaT = get_deltaT(cell_front);
@@ -79,14 +80,14 @@ int CA::run(int time, int export_time){
         // Okoli horici bunky
         for(int j = -1; j < 2; j++){
             for(int i = -1; i < 2; i++){
-                pom.cell = &(array[element.cell->x + i][element.cell->y + j]);
+                pom.cell = (array[element.cell.x + i][element.cell.y + j]);
 
-                if (pom.cell->type == NONIGNITED){
+                if (pom.cell.type == NONIGNITED){
                     fire_expand(CA_Ro(element.cell), deltaT, i, j, pom.cell);
                 }
 
                 //array[element.cell.x + i][element.cell.y + j] okoli soucasne bunky
-                if(pom.cell->type == FIRE){
+                if(pom.cell.type == FIRE){
                     pom.id = step + 1;
                     cell_front.push_back(pom); // Ulozeni horici bunky
                 }
@@ -149,18 +150,21 @@ void CA::set_distance(double dist){
 double CA::get_deltaT(std::list<cellF> front){
     double ro = 0;
     double pom;
+    std::list<cellF> pom_front;
 
     while (!front.empty()){
-        if ((pom = CA_Ro(front.front()->cell)) > ro){
+        if ((pom = CA_Ro(front.front().cell)) > ro){
             ro = pom;
         }
+        pom_front.push_back(front.front());
         front.pop_front();
     }
 
+    //cell_front = pom_front;
     return CA_cell_size / ro;
 }
 
-void CA::fire_expand(double ro, double deltaT, int x, int y, Cell& cell){
+void CA::fire_expand(double ro, double deltaT, int x, int y, Cell &cell){
     switch(x){
         case -1:
             switch(y){
