@@ -34,8 +34,6 @@ zip:
 tests: 
 	python ./tests/image_to_csv.py $(ARGS)
 
-doc:
-	@echo Documentation not available yet!
 
 # show help page of Makefile
 help:
