@@ -46,7 +46,6 @@ int main(int argc, char *argv[]) {
             { "time" , required_argument, 0, 't'},
             { "fuel" , required_argument, 0, 'f'},
             { "wind" , required_argument, 0, 'w'},
-            { "slope", required_argument, 0, 'x'},
             { "image", required_argument, 0, 'i'},
             {0, 0, 0, 0}
         };  
@@ -146,14 +145,6 @@ int main(int argc, char *argv[]) {
 				cout << "CA eccentricity:\t" << CA_eccentricity << endl;
 				break;
             
-/*		case 'x':	// --slope
-                time = strtol(optarg, &strtol_err, 10);
-                if (*strtol_err != '\0') {
-                    ERROR("Time must be integer",1);
-                }
-                break;
-  */
-
 		case '?':
 		default:
 			print_help();
@@ -162,6 +153,7 @@ int main(int argc, char *argv[]) {
     }
 
     CA *automata = new CA(csv? csv: NULL); 
+	automata->get_image_of_fire(CA_size, CA_size, "sim");
     fire_end = automata->run(CA_time, -1);
     if (fire_end != 0){
         cout << "The fire burned out before the time limit. Time: " << fire_end << endl;
@@ -175,7 +167,7 @@ int main(int argc, char *argv[]) {
 
 
 void print_help() {
-    std::cout << "usage: simulator [-h] [-s <CA size>] [-t <CA time(min)>] [-w <speed(m/s),angle(rad)>] [-c <size(m)>] [-f <0, 100>]\n";
+    std::cout << "usage: simulator [-h] [-s <CA size>] [-t <CA time(min)>] [-w <speed(m/s),angle(rad)>] [-c <size(m)>] [-f <0, 100>] [-i <csv_name>]\n";
 }
 
 

@@ -203,6 +203,8 @@ void CA::set_distance(double dist){
     }
 }
 
+// evaluate Ro (Rate of Spread) of every ignited cell 
+// and after that evaluate size of next timestep from max. Ro found
 double CA::get_deltaT(std::list<cellF> front){
     double ro = 0;
     double pom;
@@ -292,7 +294,7 @@ void CA::initialize_CA_cells(std::ifstream& file, int width, int height) {
 			file.getline(R, 4, ',');
 			file.getline(G, 4, ',');
 			file.getline(B, 4, ',');
-			
+		//cout <<atoi(R) << "-";	
 			if ((atoi(R) < 50) && (atoi(G) < 50) && (atoi(B) < 50))
 				this->array[i][j].type = NONFLAMMABLE;
 			else if (atoi(R) > 128 && (atoi(G) < 128) && (atoi(B) < 128))				
@@ -302,17 +304,18 @@ void CA::initialize_CA_cells(std::ifstream& file, int width, int height) {
 }
 
 
-/*void CA::get_image_of_fire(int w, int h, char *name) {
+void CA::get_image_of_fire(int w, int h, char *name) {
 	static int i = 0;		// counter for creating unique names of images
-	img_name[256];
-	char int_to_str[20];	// buffer for converting int to string
-	sprintf(img_name, "%d_%s", i, name);
+	char img_name[256];
+	sprintf(img_name, "%d_%s.bmp", i, name);
 
 
 	FILE *f;
 	unsigned char *img = NULL;
 	int filesize = 54 + 3*w*h;  //w is your image width, h is image height, both int
-	
+	int x, y;
+	unsigned char r,g,b;
+
 	img = (unsigned char *)malloc(3*w*h);
 	memset(img,0,3*w*h);
 	
@@ -321,12 +324,13 @@ void CA::initialize_CA_cells(std::ifstream& file, int width, int height) {
 	    for(int j=0; j<h; j++)
 	    {
 	        x=i; y=(h-1)-j;
-	        r = red[i][j]*255;
-	        g = green[i][j]*255;
-	        b = blue[i][j]*255;
-	        if (r > 255) r=255;
-	        if (g > 255) g=255;
-	        if (b > 255) b=255;
+	        
+			switch (this->array[i][j].type) {
+				case NONIGNITED:	r=0;   g=255; b=0;	break;
+				case FIRE:			r=255; g=0;   b=0;	break;
+				case BURNED:		r=50;  g=50;  b=50;	break;
+				case NONFLAMMABLE:	r=255; g=255; b=255;break;
+			}
 
 			// bmp stores colors as BGR (0,1,2 indices)
 	        img[(x+y*w)*3+2] = (unsigned char)(r);
@@ -353,7 +357,7 @@ void CA::initialize_CA_cells(std::ifstream& file, int width, int height) {
 	bmpinfoheader[10] = (unsigned char)(       h>>16);
 	bmpinfoheader[11] = (unsigned char)(       h>>24);
 	
-	f = fopen("img.bmp","wb");
+	f = fopen(img_name,"wb");
 	fwrite(bmpfileheader,1,14,f);
 	fwrite(bmpinfoheader,1,40,f);
 	for(int i=0; i<h; i++)
@@ -365,7 +369,7 @@ void CA::initialize_CA_cells(std::ifstream& file, int width, int height) {
 	free(img);
 	fclose(f);	
 	
-}*/
+}
 
 
 

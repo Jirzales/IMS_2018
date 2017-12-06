@@ -86,6 +86,7 @@ class CA {
 		CA();
         ~CA();
 
+		void get_image_of_fire(int w, int h, char *name); 
         int run(int time, int exportTime);
         int get_size();
         
