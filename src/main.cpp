@@ -20,7 +20,7 @@ int CA_size = CA_DEF_SIZE,	// Width/height of Cellular automaton's lattice
 
 // function prototypes
 void print_help( void );
-double angles_to_radians(int angles);
+double angles_to_radians(double angles);
 
 
 /********************************************************************* MAIN FUNCTION **********************************************************************/
@@ -93,24 +93,27 @@ int main(int argc, char *argv[]) {
             case 'w':	// --wind
 				strtk = strtok(optarg, ",");
 
-				if (strtk != NULL) {
-					CA_wind_speed = strtol(strtk, &strtol_err, 10);
-                	_errno = errno;
-					if (*strtol_err != '\0') 
-						ERROR("Time must be integer!\n",1);
+				if (strtk == NULL)
+					ERROR("Wring format for wind size!\n", 1);
+	 
+				CA_wind_speed = strtol(strtk, &strtol_err, 10);
+               	_errno = errno;
+				if (*strtol_err != '\0') 
+					ERROR("Time must be integer!\n",1);
 				
-					if ((strtk = strtok(NULL, ",")) == NULL )
-						ERROR("You forgot to specify the angle of wind!\n",1);
-					if (strtok(NULL, ",") != NULL)
-						ERROR("Parameter -w contains too much values!\n",1);
+				if ((strtk = strtok(NULL, ",")) == NULL )
+					ERROR("You forgot to specify the angle of wind!\n",1);
+				if (strtok(NULL, ",") != NULL)
+					ERROR("Parameter -w contains too much values!\n",1);
 					
-					CA_wind_angle = strtol(strtk, &strtol_err, 10);
-                	_errno = errno;
-					if (*strtol_err != '\0') 
-						ERROR("Time must be integer!\n",1);
+				CA_wind_angle = strtol(strtk, &strtol_err, 10);
+               	_errno = errno;
+				if (*strtol_err != '\0') 
+					ERROR("Time must be integer!\n",1);
 
-					CA_wind_angle = angles_to_radians((int)CA_wind_angle);
-				}
+				CA_wind_angle = angles_to_radians(CA_wind_angle);
+				CA_eccentricity = CA_get_eccentricity();
+					
 
 				break;
             
@@ -135,10 +138,10 @@ int main(int argc, char *argv[]) {
     if (fire_end != 0){
         cout << "The fire burned out before the time limit. Time: " << fire_end << endl;
     }
-    delete automata;
 
 	automata->test_function();
 
+    delete automata;
     return EXIT_SUCCESS;
 }
 
@@ -148,8 +151,8 @@ void print_help() {
 }
 
 
-double angles_to_radians(int angles) {
-	return (3.1415927 * angles) / 180;	
+double angles_to_radians(double angles) {
+	return (3.1415927 * angles) / 180.;	
 }
 
 

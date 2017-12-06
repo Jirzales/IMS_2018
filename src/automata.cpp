@@ -130,8 +130,9 @@ void CA::test_function() {
 	//std::cout << CA_GAMMAmax(cell) << std::endl;
 	//std::cout << CA_GAMMA(cell) << std::endl;
 	//std::cout << CA_IR(cell) << std::endl;
-	std::cout << CA_Ro(cell) << std::endl;
 	//std::cout << CA_Wn(cell) << std::endl;
+	//std::cout << CA_Ro(cell) << std::endl;
+	//std::cout << CA_R(cell, 34) << std::endl;
 
 	//std::cout << A(cell) << std::endl;
 	//std::cout << B(cell) << std::endl;

@@ -39,13 +39,13 @@ doc:
 
 # show help page of Makefile
 help:
-	@echo 
-	@echo 
-	@echo 
-	@echo 
-	@echo 
-	@echo 
-	@echo 
-	@echo 
-	@echo 
-	@echo 
+	@echo ""
+	@echo "-------------------- makefile echo --------------------"
+	@echo "make:        Compile simulator"
+	@echo "make run     Compile and runs simulator"	
+	@echo "make all     Compile simulator"
+	@echo "make clean   Remove all obj and csv files + executable file"
+	@echo "make zip     Zip all files and directories in actual directory"
+	@echo "make help    Shows this help"
+	@echo "make tests   Python script for converting image colors into csv field"
+

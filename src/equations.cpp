@@ -2,6 +2,8 @@
 
 extern double CA_eccentricity;
 extern double CA_wind_speed;
+extern double CA_wind_angle;
+
 
 /**
  * This tree show dependencies of all formulas, equations
@@ -93,7 +95,6 @@ bool double_equals(double a, double b, double epsilon)
 }
 #define CHECK_MIN(a,eps)	(double)(double_equals(a, 0, eps)? eps: a)
 
-// long symbols evaluation
 
 
 // auxilarry symbols/functions for better readibility of other equations that contain them
@@ -112,15 +113,19 @@ double E ( Cell& cell ) {
 }
 
 
-// main output functions used mainly to evaluate 'rate of spread' (R) parameter
+/********************************************  main output functions used mainly to evaluate 'rate of spread' (R) parameter ************************************************/
 
-double CA_rate_of_spread_eccentricity(Cell& cell) {
-	return CA_Ro(cell) * ((1 - CA_eccentricity) / (1 - (CA_eccentricity * CA_wind_speed)));
+double CA_rate_of_spread_eccentricity(Cell& cell, double radians) {
+	return CA_Ro(cell) * ((1 - CA_eccentricity) / (1 - (CA_eccentricity * cos(fabs(radians - CA_wind_angle)))));
 }
 
 double CA_rate_of_spread_nowind(Cell& cell, double eps) {
-	return ( (CA_IR(cell) * CA_Xi(cell)) / 
+	return ( (CA_IR(cell) * CA_Xi(cell)) * ((CA_wind_speed==0)? 1: (1 + CA_PHI(cell)))/ 
 			CHECK_MIN(CA_Pb(cell) * CA_EPSILON(cell) * CA_Qig(cell), eps) );
+}
+
+double CA_wind_coefficient(Cell& cell) {
+	return (C(cell) * pow(CA_wind_speed, B(cell)) * pow(CA_BETA(cell) / CA_BETAop(cell), -E(cell)) );
 }
 
 double CA_ovendry_bulk_density(Cell& cell, double eps) {
@@ -178,35 +183,70 @@ double CA_heat_of_preignition(Cell& cell) {
 	return ( 522. + (2332. * cell.moistureContent) );
 }
 
-
+/****************************************************** Equations for computing Length-to-Width ratio of ellipse ********************************************************/
 
 // U.S. standard versions for different wind speed in mid-height of 6.1m [m/s]
 
-double CA_length_to_width__USstandard27(double wind_speed) {	// less than 12.07 m/s
+double CA_LW__USstandard27(double wind_speed) {		// less than 12.07 m/s
 	return 1.0 + (0.00452 * pow(wind_speed, 2.154));
 }
-double CA_length_to_width__USstandard27_2(double wind_speed) {	// less than 12.07 m/s
+double CA_LW__USstandard27_2(double wind_speed) {	// less than 12.07 m/s
 	return 0.5 + 0.5 * exp(0.09326 * wind_speed);
 }
-double CA_length_to_width__USstandard25(double wind_speed) {	// less than 11.176 m/s
+double CA_LW__USstandard25(double wind_speed) {		// less than 11.176 m/s
 	return exp(0.11626 * pow(wind_speed, 0.86559));
 }
-double CA_length_to_width__USstandard1(double wind_speed) {		// greater than 0.447 m/s
+double CA_LW__USstandard1(double wind_speed) {		// greater than 0.447 m/s
 	return 1.46 * pow(wind_speed, 0.464);
 }
 
-double get_LW(double wind_speed) {
-	if (wind_speed == ) {
+// versions used for different density and/or type of fuels
 
-	} else if () {
-		
-	}
+double CA_LW__dense_forest(double wind_speed) {		// used for dense forest
+	return (0.936 * exp(0.04464 * wind_speed) * 0.461 * exp(-0.02693 * wind_speed));
+}
+double CA_LW__open_forest(double wind_speed) {		// used for open forests
+	return (0.936 * exp(0.007 * wind_speed) * 0.461 * exp(-0.04032 * wind_speed));
+}
+double CA_LW_light_fuels(double wind_speed) {		// used for grass, low/medium slash, leafless hardwood stands
+	return (0.936 * exp(0.1607 * wind_speed) * 0.461 * exp(-0.05364 * wind_speed));
+}
+
+// other equations gained through experiments
+double CA_LW__McArthur(double wind_speed) {
+	return 1.1 * pow(wind_speed / 0.277777, 0.464);
 }
 
 
 
+// function which automatically choose best function for evaluating length-to-width
+// based upon all relevant CA parameters
+double CA_LW() {
+	if (CA_wind_speed) {
+		// use universal equation for winds faster than 12.07 m/s
+		if (CA_wind_speed > 11.176 ) {
+			return CA_LW__USstandard27(CA_wind_speed);
+		} 
+		else if (CA_wind_speed > 0.447 ) {
+			return CA_LW__USstandard1(CA_wind_speed);
+		} else {
+			return CA_LW__McArthur(CA_wind_speed);
+		}
+	}
+	// no-wind conditions 
+	else {
+		// you can set there any value from above US standard values depending on fuel type
+		if(1) {
+			return CA_LW__McArthur(CA_wind_speed);
+		}
+	}
 
+}
 
+// return eccentricity
+double CA_get_eccentricity() {
+	return sqrt(1 - (1 / pow(CA_LW(), 2)));
+}
 
 
 

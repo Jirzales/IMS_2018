@@ -32,8 +32,8 @@ bool double_equals(double a, double b, double epsilon = EPS);
 #define CA_EPSILON(a)	(CA_effective_heating_number(a))
 #define CA_Qig(a)		(CA_heat_of_preignition(a))
 #define CA_Ro(a)		(CA_rate_of_spread_nowind(a))
-#define CA_Rrad(a)		(CA_rate_of_spread_eccentricity(a))
-
+#define CA_R(a,ang)		(CA_rate_of_spread_eccentricity(a,ang))
+#define CA_PHI(a)		(CA_wind_coefficient(a))
 
 // macro-functions for better readibility in other functions
 
@@ -45,7 +45,7 @@ double E (Cell& cell);
 // main output functions used mainly to evaluate 'rate of spread' (R) parameter
 
 double CA_rate_of_spread_nowind			(Cell& cell, double eps=EPS);
-double CA_rate_of_spread_eccentricity	(Cell& cell);
+double CA_rate_of_spread_eccentricity	(Cell& cell, double radians);
 double CA_ovendry_bulk_density			(Cell& cell, double eps=EPS);
 double CA_packing_ratio					(Cell& cell, double eps=EPS);
 double CA_optimum_packing_ratio			(Cell& cell);
@@ -58,25 +58,24 @@ double CA_mineral_damping_coefficient	(Cell& cell);
 double CA_reaction_intensity			(Cell& cell);
 double CA_effective_heating_number		(Cell& cell, double eps=EPS);
 double CA_heat_of_preignition			(Cell& cell);
+double CA_wind_coefficient				(Cell& cell);
      
 // equations for computing eccentricity of fire/elipse spread shape
 
-/******* different equations for getting length-to-width ratio*/
-double CA_length_to_width__McArthur(double wind_speed);
-double CA_length_to_width__Simard(double wind_speed);
-double CA_length_to_width__(double wind_speed);
-
-
 // U.S. standard versions for different wind speed in mid-height of 6.1m [m/s]
-double CA_length_to_width__USstandard27  (double wnid_speed);	// wind speed less than 12.07 m/s
-double CA_length_to_width__USstandard27_2(double wnid_speed);	// wind speed less than 12.07 m/s
-double CA_length_to_width__USstandard25  (double wnid_speed);	// wind speed less than 11.176 m/s
-double CA_length_to_width__USstandard1   (double wnid_speed);	// wind speed greather than 0.447 m/s
+double CA_LW__USstandard27  (double wnid_speed);	// wind speed less than 12.07 m/s
+double CA_LW__USstandard27_2(double wnid_speed);	// wind speed less than 12.07 m/s
+double CA_LW__USstandard25  (double wnid_speed);	// wind speed less than 11.176 m/s
+double CA_LW__USstandard1   (double wnid_speed);	// wind speed greather than 0.447 m/s
 
-//double 
+// versions used for different density and/or type of fuels
+double CA_LW__dense_forest(double wind_speed);
+double CA_LW__open_forest(double wind_speed);
+double CA_LW__light_fuels(double wind_speed);
 
-
-
-
+// other LW equations
+double CA_LW__McArthur(double wind_speed);
+double CA_LW();
+double CA_get_eccentricity();
 
 #endif
