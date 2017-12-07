@@ -73,6 +73,7 @@ class CA {
         double distance_sum = 0;
         Cell** array;
 
+        double angles_to_radians(double angles);
         bool turn_off(cellF& cellf);
         void set_distance(double dist);
         double get_deltaT(std::list<cellF> front);
@@ -87,7 +88,7 @@ class CA {
 
 		void get_image_of_fire(int w, int h, char *name); 
         void check_neighbours(cellF& cellf, int step, double deltaT);
-		int run();
+		double run();
         int get_size();
         
         // test functions

@@ -44,6 +44,15 @@ CA::CA(char *csv) {
 		for (int y = 0; y < CA_size; y++) {
 			array[x][y].x = x;
 			array[x][y].y = y;
+            array[x][y].load = 1.08;                       // W)
+            array[x][y].depth = 1.;                        // DELTA
+            array[x][y].surfaceToVolume = 5000;            // SIGMA
+            array[x][y].heatContent = 15430;                 // h
+            array[x][y].moistureContent = 0.09;            // Mf
+            array[x][y].moistureContentOfExtinction = 0.3;// Mx
+            array[x][y].ovendryDensity = 40.;              // Pp
+            array[x][y].totalMineralContent = 0.0001;      // St
+            array[x][y].effectiveMineralContent = 20.;     // Se
 		}
     }
 
@@ -80,24 +89,12 @@ CA::~CA() {
 }
 
 
-int CA::run(){
+double CA::run(){
     int step = 0;
     cellF element,pom;
     Cell a;
     element.id = 0;
 	double act_time = 0;
-
-/*
- 	// find all FIRE cells and add them into the front
-	for (int i=0; i < CA_size; i++) {
-		for (int j=0; j < CA_size; j++) {
-			if (element.cell.type == FIRE) {
-				element.cell = this->array[i][j];
-				cell_front.push_back(element);
-			}
-		}
-	}
-*/
 
 	element.cell = this->array[CA_size/2][CA_size/2];
 	array[CA_size/2][CA_size/2].type = FIRE;
@@ -107,10 +104,6 @@ int CA::run(){
 
     // Hlavni cyklus krokovani
     while(true) {
-        // front runs out of ignited FIRE cells
-        if(cell_front.empty()) {
-            return(step);
-        }
 
         if ((element = cell_front.front()).id > step){
             step = element.id;
@@ -121,15 +114,19 @@ int CA::run(){
            	deltaT = get_deltaT(cell_front);
 			act_time += deltaT;
 
+            get_image_of_fire(CA_size, CA_size,"final");
+
 			if (act_time > CA_time ) {
 				check_neighbours(element, step, deltaT);
-				// toto tu nema byt, odfotime az ked je fronta prazdna
-				//get_image_of_fire(CA_size, CA_size, "final");
-				continue;
 				return EXIT_SUCCESS;
 			}
         }
 
+        // front runs out of ignited FIRE cells
+        if(cell_front.empty()) {
+            get_image_of_fire(CA_size, CA_size,"burnout");
+            return(act_time);
+        }
 		check_neighbours(element, step, deltaT);
     }
     return 0;
@@ -150,6 +147,7 @@ void CA::check_neighbours(cellF& cellf, int step ,double deltaT) {
 
 			if (pom.cell.type == NONIGNITED){
 				fire_expand(pom.cell, deltaT, x, y);
+
                 pom.id = step + 1;
 				cell_front_nonig.push_back(pom);
 			}
@@ -159,7 +157,7 @@ void CA::check_neighbours(cellF& cellf, int step ,double deltaT) {
                     endfire = turn_off(pom);
                 }
 
-                if (!endfire){
+                if (endfire){
 				    pom.id = step + 1;
 				    cell_front.push_back(pom); // Ulozeni horici bunky
                 }
@@ -173,34 +171,33 @@ bool CA::turn_off(cellF& cellf){
 
     for(int y = -1; y < 2; y++){
         for(int x = -1; x < 2; x++){    
-            if(array[cellf.cell.x + x][cellf.cell.y + y].type == FIRE || array[cellf.cell.x + x][cellf.cell.y + y].type == NONFLAMMABLE){
+            if(array[cellf.cell.x + x][cellf.cell.y + y].type == FIRE || array[cellf.cell.x + x][cellf.cell.y + y].type == NONFLAMMABLE || array[cellf.cell.x + x][cellf.cell.y + y].type == BURNED){
                 ch++;
             }
         }
     }
     if (ch == 9){
         array[cellf.cell.x][cellf.cell.y].type = BURNED;
-        cout << "lol" << endl;
-        return true;
+        return false;
     }
-    return false;
+    return true;
 }
 
 
 void CA::test_function() {
 	Cell cell;
-	cell.load = 1.08;						// W)
-	cell.depth = 1.;						// DELTA
+    cell.load = 1.08;                       // W)
+    cell.depth = 1.;                        // DELTA
     cell.x = 51;
     cell.y = 51;
     cell.type = FIRE;
-	cell.surfaceToVolume = 5000;			// SIGMA
-    cell.heatContent = 1.5;					// h
-    cell.moistureContent = 0.09;			// Mf
+    cell.surfaceToVolume = 5000;            // SIGMA
+    cell.heatContent = 15430;                 // h
+    cell.moistureContent = 0.09;            // Mf
     cell.moistureContentOfExtinction = 0.3;// Mx
-    cell.ovendryDensity = 40.;				// Pp
-    cell.totalMineralContent = 0.0001;		// St
-    cell.effectiveMineralContent = 20.;		// Se
+    cell.ovendryDensity = 40.;              // Pp
+    cell.totalMineralContent = 0.0001;      // St
+    cell.effectiveMineralContent = 20.;     // Se
 
 	// test cases
 	std::cout.precision(17);
@@ -216,8 +213,16 @@ void CA::test_function() {
 	//std::cout << CA_IR(cell) << std::endl;
 	//std::cout << CA_Wn(cell) << std::endl;
 	//std::cout << CA_Ro(cell) << std::endl;
-	//std::cout << CA_R(cell, 4) << std::endl;
-
+	//std::cout << CA_R(cell, 10) << std::endl;
+    //std::cout << CA_R(cell, 55) << std::endl;
+    //std::cout << CA_R(cell, 100) << std::endl;
+    //std::cout << CA_R(cell, 145) << std::endl;
+    //std::cout << CA_R(cell, 190) << std::endl;
+    //std::cout << CA_R(cell, 235) << std::endl;
+    //std::cout << CA_R(cell, 280) << std::endl;
+    //std::cout << CA_R(cell, 325) << std::endl;
+    //std::cout << CA_R(cell, 370) << std::endl;
+//exit(0);
 	//std::cout << A(cell) << std::endl;
 	//std::cout << B(cell) << std::endl;
 	//std::cout << C(cell) << std::endl;
@@ -241,17 +246,14 @@ void CA::set_distance(double dist){
 double CA::get_deltaT(std::list<cellF> front){
     double ro = 0;
     double pom;
-    std::list<cellF> pom_front;
 
     while (!front.empty()){
-        //if ((pom = CA_Ro(front.front().cell)) > ro){
-        if ((pom = RO_TR) > ro) {
+        if ((pom = CA_Ro(front.front().cell)) > ro){
             ro = pom;
         }
-        pom_front.push_back(front.front());
         front.pop_front();
     }
-    cell_front = pom_front;
+
     return CA_cell_size / ro;
 }
 
@@ -260,44 +262,36 @@ void CA::fire_expand(Cell& from_cell, double deltaT, int x, int y){
         case -1:
             switch(y){
                 case -1:
-                array[from_cell.x][from_cell.y].fire[0] += RO_TR * deltaT;
-                    //array[from_cell.x][from_cell.y].fire[0] += CA_R(from_cell, 2.35619) * deltaT;
+                    array[from_cell.x][from_cell.y].fire[0] += CA_R(from_cell, 2.35619) * deltaT;
                     return;
                 case 0:
-                array[from_cell.x][from_cell.y].fire[1] += RO_TR * deltaT;
-                    //array[from_cell.x][from_cell.y].fire[1] += CA_R(from_cell, 3.14159) * deltaT;
+                    array[from_cell.x][from_cell.y].fire[1] += CA_R(from_cell, 3.14159) * deltaT;
                     return;
                 case 1:
-                array[from_cell.x][from_cell.y].fire[2] += RO_TR * deltaT;
-                    //array[from_cell.x][from_cell.y].fire[2] += CA_R(from_cell, 3.92699) * deltaT;
+                    array[from_cell.x][from_cell.y].fire[2] += CA_R(from_cell, 3.92699) * deltaT;
                     return;
 
             }
         case 0:
             switch(y){
                 case -1:
-                array[from_cell.x][from_cell.y].fire[3] += RO_TR * deltaT;
-                //    array[from_cell.x][from_cell.y].fire[3] += CA_R(from_cell, 1.57079) * deltaT;
+                    array[from_cell.x][from_cell.y].fire[3] += CA_R(from_cell, 1.57079) * deltaT;
                     return;
                 case 1:
-                array[from_cell.x][from_cell.y].fire[4] += RO_TR * deltaT;
-                  //  array[from_cell.x][from_cell.y].fire[4] += CA_R(from_cell, 4.71238) * deltaT;
+                    array[from_cell.x][from_cell.y].fire[4] += CA_R(from_cell, 4.71238) * deltaT;
                     return;
                 
             }
         case 1:
             switch(y){
                 case -1:
-                array[from_cell.x][from_cell.y].fire[5] += RO_TR * deltaT;
-                    //array[from_cell.x][from_cell.y].fire[5] += CA_R(from_cell, 0.78539) * deltaT;
+                    array[from_cell.x][from_cell.y].fire[5] += CA_R(from_cell, 0.78539) * deltaT;
                     return;
                 case 0:
-                array[from_cell.x][from_cell.y].fire[6] += RO_TR * deltaT;
-                    //array[from_cell.x][from_cell.y].fire[6] += CA_R(from_cell, 0.) * deltaT;
+                    array[from_cell.x][from_cell.y].fire[6] += CA_R(from_cell, 0.) * deltaT;
                     return;
                 case 1:
-                array[from_cell.x][from_cell.y].fire[7] += RO_TR * deltaT;
-                    //array[from_cell.x][from_cell.y].fire[7] += CA_R(from_cell, 5.49778) * deltaT;
+                    array[from_cell.x][from_cell.y].fire[7] += CA_R(from_cell, 5.49778) * deltaT;
                     return;
                 
             }
@@ -305,24 +299,21 @@ void CA::fire_expand(Cell& from_cell, double deltaT, int x, int y){
 }
 
 void CA::cell_ignite(){
-    double cell_sum = 0;
+    double cell_sum;
     Cell pom_cell;
 
     while(!cell_front_nonig.empty()){
+        cell_sum = 0;
         pom_cell = cell_front_nonig.front().cell;
         for (int i = 0; i < 8; i++){
             if (array[pom_cell.x][pom_cell.y].fire[i] > distance[i]){ 
                 array[pom_cell.x][pom_cell.y].type = FIRE; 
-                cout << "here" << endl;
                 break;
             }
-            cout << pom_cell.fire[i];
             cell_sum += array[pom_cell.x][pom_cell.y].fire[i];
         }
-
-        cout << cell_sum << endl;
+        
         if (distance_sum / 2 < cell_sum){
-            cout << "ad" << endl;
             array[pom_cell.x][pom_cell.y].type = FIRE;
         }
 
@@ -338,6 +329,10 @@ void CA::initialize_CA_cells(std::ifstream& file, int width, int height) {
 			file.getline(R, 4, ',');
 			file.getline(G, 4, ',');
 			file.getline(B, 4, ',');
+
+            if (i == 0 || j == 0 || i == height-1 || j == width-1){
+                this->array[i][j].type = NONFLAMMABLE;
+            }
 
 			if ((atoi(R) < 50) && (atoi(G) < 50) && (atoi(B) < 50)) {
 				this->array[i][j].type = NONFLAMMABLE;
@@ -422,7 +417,9 @@ int rndm() {
 	return 1 + (rand() % static_cast<int>(100));
 }
 
-
+double CA::angles_to_radians(double angles) {
+    return (3.1415927 * angles) / 180.; 
+}
 
 
 
