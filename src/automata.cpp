@@ -34,12 +34,17 @@ CA::CA(char *csv) {
 		if ((width != height) && (width != CA_size))
 			ERROR("Error: input size is different from csv data size", 2);
 	}
-    this->size = width;
+    CA_size = width;
 
     // allocating space for Cellular Automaton
-    Cell** array = new Cell*[this->size];
-    for(int i = 0; i < size; ++i){
-        array[i] = new Cell[this->size];
+    Cell** array = new Cell*[CA_size];
+    for(int x = 0; x < CA_size; x++) {
+
+        array[x] = new Cell[CA_size];
+		for (int y=0; y<CA_size; y++) {
+			array[x][y].x = x;
+			array[x][y].y = y;
+		}
     }
 
     this->array = array;
@@ -47,8 +52,8 @@ CA::CA(char *csv) {
 
 	// set randomly every cell to FUEL or IGNITED
 	// yo can set probability (in %) of generating FUEL	
-	for (int i=0; i < this->size; i++) {
-		for (int j=0; j < this->size; j++) {
+	for (int i=0; i < CA_size; i++) {
+		for (int j=0; j < CA_size; j++) {
 			if (rndm() <= CA_fuel_prob) {
 				this->array[i][j].type = NONIGNITED;
 			}
@@ -60,7 +65,8 @@ CA::CA(char *csv) {
     set_distance(CA_cell_size);
 	
 	if (csv != NULL) {
-		initialize_CA_cells(file, width, height);
+		//initialize_CA_cells(file, width, height);
+		
 		file.close();
 	}
 }
@@ -73,35 +79,36 @@ CA::~CA() {
     delete(this->array);
 }
 
-int CA::get_size() {
-    return this->size;
-}
 
 int CA::run(){
     int step = 0;
     cellF element,pom;
     Cell a;
-
     element.id = 0;
-
-
 	double act_time = 0;
 
-
-	for (int i=0; i < this->size; i++)
-		for (int j=0; j < this->size; j++)
-//cout << "actual time: " << act_time << endl;
+/*
+ 	// find all FIRE cells and add them into the front
+	for (int i=0; i < CA_size; i++) {
+		for (int j=0; j < CA_size; j++) {
 			if (element.cell.type == FIRE) {
 				element.cell = this->array[i][j];
 				cell_front.push_back(element);
 			}
+		}
+	}
+*/
 
-    double deltaT = get_deltaT(cell_front);
+	element.cell = this->array[CA_size/2][CA_size/2];
+	element.cell.type = FIRE;
+	cell_front.push_back(element);
+    
+	double deltaT = get_deltaT(cell_front);
 
     // Hlavni cyklus krokovani
     while(true) {
-
-        // Dosel ohen
+cout << "gaga   ";
+        // front runs out of ignited FIRE cells
         if(cell_front.empty()) {
             return(step);
         }
@@ -110,81 +117,53 @@ int CA::run(){
             step = element.id;
 			
 			// Zjisteni zda se ma nehorici bunka podpalit
-            cell_ingite(); 
+            cell_ignite(); 
 
 			// get next timestep difference in seconds and check for end of simulation
            	deltaT = get_deltaT(cell_front);
 			act_time += deltaT;
+
 			if (act_time > CA_time ) {
-				get_image_of_fire(this->size, this->size, "final");
+				check_neighbours(element, step, deltaT);
+				// toto tu nema byt, odfotime az ked je fronta prazdna
+				//get_image_of_fire(CA_size, CA_size, "final");
+				continue;
 				return EXIT_SUCCESS;
 			}
-			
-
         }
 
-        // Vyhozeni pouzite nastene bunky z fronty
-        cell_front.pop_front();
-
-        // Okoli horici bunky
-        for(int j = -1; j < 2; j++){
-            for(int i = -1; i < 2; i++){
-                pom.cell = (array[element.cell.x + i][element.cell.y + j]);
-
-                if (pom.cell.type == NONIGNITED){
-                    //fire_expand(CA_Ro(element.cell), deltaT, i, j, pom.cell);
-    				switch(i){ // j == y
-						case -1:
-							switch(j){
-								case -1:
-                    				fire_expand(CA_R(element.cell, 2.3561), deltaT, i, j, pom.cell);
-									break;
-								case 0:
-                    				fire_expand(CA_R(element.cell, 3.14159), deltaT, i, j, pom.cell);
-									break;
-								case 1:
-                    				fire_expand(CA_R(element.cell, 3.927), deltaT, i, j, pom.cell);
-									break;
-
-							}
-						case 0:
-							switch(j){
-								case -1:
-                    				fire_expand(CA_R(element.cell, 1.57079), deltaT, i, j, pom.cell);
-									break;
-								case 1:
-                    				fire_expand(CA_R(element.cell, 4.71238), deltaT, i, j, pom.cell);
-									break;
-								
-							}
-						case 1:
-							switch(j){
-								case -1:
-                    				fire_expand(CA_R(element.cell, 0.78539), deltaT, i, j, pom.cell);
-									break;
-								case 0:
-                    				fire_expand(CA_R(element.cell, 0), deltaT, i, j, pom.cell);
-									break;
-								case 1:
-                    				fire_expand(CA_R(element.cell, 5.49778), deltaT, i, j, pom.cell);
-									break;
-								
-							}
-					}
-                    cell_front_nonig.push_back(pom);
-                }
-
-                //array[element.cell.x + i][element.cell.y + j] okoli soucasne bunky
-                if(pom.cell.type == FIRE){
-                    pom.id = step + 1;
-                    cell_front.push_back(pom); // Ulozeni horici bunky
-                }
-            }
-        }
+		check_neighbours(element, step, deltaT);
 
     }
     return 0;
 }
+
+
+void CA::check_neighbours(cellF& cellf, int step ,double deltaT) {
+	cellF pom;
+
+    // Vyhozeni pouzite nastene bunky z fronty
+    cell_front.pop_front();
+
+	// Okoli horici bunky
+	for(int y = -1; y < 2; y++){
+		for(int x = -1; x < 2; x++){
+			pom.cell = array[cellf.cell.x + x][cellf.cell.y + y];
+	
+			if (pom.cell.type == NONIGNITED){
+				fire_expand(cellf.cell, deltaT, x, y, pom.cell);
+				cell_front_nonig.push_back(pom);
+			}
+	
+			//array[element.cell.x + i][element.cell.y + j] okoli soucasne bunky
+			if(pom.cell.type == FIRE){
+				pom.id = step + 1;
+				cell_front.push_back(pom); // Ulozeni horici bunky
+			}
+		}
+	}
+}
+
 
 void CA::test_function() {
 	Cell cell;
@@ -215,7 +194,7 @@ void CA::test_function() {
 	//std::cout << CA_IR(cell) << std::endl;
 	//std::cout << CA_Wn(cell) << std::endl;
 	//std::cout << CA_Ro(cell) << std::endl;
-	//std::cout << CA_R(cell, 0) << std::endl;
+	//std::cout << CA_R(cell, 4) << std::endl;
 
 	//std::cout << A(cell) << std::endl;
 	//std::cout << B(cell) << std::endl;
@@ -243,59 +222,62 @@ double CA::get_deltaT(std::list<cellF> front){
     std::list<cellF> pom_front;
 
     while (!front.empty()){
-        if ((pom = CA_Ro(front.front().cell)) > ro){
+        //if ((pom = CA_Ro(front.front().cell)) > ro){
+        if ((pom = RO_TR) > ro) {
             ro = pom;
         }
         pom_front.push_back(front.front());
         front.pop_front();
     }
-
-    //cell_front = pom_front;
+cout << "what is: " << CA_cell_size/ro<< endl;
+    cell_front = pom_front;
     return CA_cell_size / ro;
 }
 
-void CA::fire_expand(double ro, double deltaT, int x, int y, Cell &cell){
+void CA::fire_expand(Cell& from_cell, double deltaT, int x, int y, Cell& to_cell){
+cout << CA_R(from_cell, 2.35619) * deltaT;
+
     switch(x){
         case -1:
             switch(y){
                 case -1:
-                    cell.fire[0] += ro * deltaT;
+                    to_cell.fire[0] += CA_R(from_cell, 2.35619) * deltaT;
                     return;
                 case 0:
-                    cell.fire[1] += ro * deltaT;
+                    to_cell.fire[1] += CA_R(from_cell, 3.14159) * deltaT;
                     return;
                 case 1:
-                    cell.fire[2] += ro * deltaT;
+                    to_cell.fire[2] += CA_R(from_cell, 3.92699) * deltaT;
                     return;
 
             }
         case 0:
             switch(y){
                 case -1:
-                    cell.fire[3] += ro * deltaT;
+                    to_cell.fire[3] += CA_R(from_cell, 1.57079) * deltaT;
                     return;
                 case 1:
-                    cell.fire[4] += ro * deltaT;
+                    to_cell.fire[4] += CA_R(from_cell, 4.71238) * deltaT;
                     return;
                 
             }
         case 1:
             switch(y){
                 case -1:
-                    cell.fire[5] += ro * deltaT;
+                    to_cell.fire[5] += CA_R(from_cell, 0.78539) * deltaT;
                     return;
                 case 0:
-                    cell.fire[6] += ro * deltaT;
+                    to_cell.fire[6] += CA_R(from_cell, 0.) * deltaT;
                     return;
                 case 1:
-                    cell.fire[7] += ro * deltaT;
+                    to_cell.fire[7] += CA_R(from_cell, 5.49778) * deltaT;
                     return;
                 
             }
     }
 }
 
-void CA::cell_ingite(){
+void CA::cell_ignite(){
     double cell_sum = 0;
     Cell pom_cell;
 

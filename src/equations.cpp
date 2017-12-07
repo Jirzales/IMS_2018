@@ -117,7 +117,7 @@ double E ( Cell& cell ) {
 
 double CA_rate_of_spread_eccentricity(Cell& cell, double radians) {
 	//return CA_Ro(cell) * ((1 - CA_eccentricity) / (1 - (CA_eccentricity * cos(fabs(radians - CA_wind_angle)))));
-	return RO_TR * ((1 - CA_eccentricity) / (1 - (CA_eccentricity * cos(fabs(radians - CA_wind_angle)))));
+	return (RO_TR * (1 + CA_wind_coefficient(cell))) * ((1 - CA_eccentricity) / (1 - (CA_eccentricity * cos(fabs(radians - CA_wind_angle)))));
 }
 
 double CA_rate_of_spread_nowind(Cell& cell, double eps) {

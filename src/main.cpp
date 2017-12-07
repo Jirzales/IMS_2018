@@ -63,7 +63,6 @@ int main(int argc, char *argv[]) {
             case 'i':	// --size
                 csv = optarg;
 				
-				//cout << "csv name: " << csv << endl;
 				break;
 
             case 's':	// --size
@@ -75,7 +74,6 @@ int main(int argc, char *argv[]) {
                 if (CA_size < CA_MIN_SIZE || CA_size > CA_MAX_SIZE || _errno == ERANGE)
                     ERROR("Wrong size!",1);
 
-				//cout << "CA size:\t" << CA_size<< endl;	
 				break;
 	
             case 'c':	// --cell
@@ -87,10 +85,9 @@ int main(int argc, char *argv[]) {
                 if (CA_cell_size < CELL_MIN_SIZE || CA_cell_size > CELL_MAX_SIZE || _errno == ERANGE)
                     ERROR("Wrong CA size format/number!",1);
 
-				//cout << "Cell size:\t" << CA_cell_size<< endl;
 				break;
 
-            case 'f':	// --time
+            case 'f':	// --fuel
                 CA_fuel_prob = strtol(optarg, &strtol_err, 10);
                 _errno = errno;
 
@@ -100,7 +97,6 @@ int main(int argc, char *argv[]) {
                 if (CA_fuel_prob < 0 || CA_fuel_prob > 100 ||_errno == ERANGE)
                     ERROR("Wrong range or format for fuel probability!",1);
 
-				//cout << "Probability of fuel:\t" << CA_fuel_prob << endl;
 				break;
 
             case 't':	// --time
@@ -113,7 +109,6 @@ int main(int argc, char *argv[]) {
                 if (CA_time <= 0 || _errno == ERANGE)
                     ERROR("Wrong simulation time number!",1);
 
-				//cout << "Sim. time:\t" << CA_time << endl;
 				break;
 
             case 'w':	// --wind
@@ -125,17 +120,17 @@ int main(int argc, char *argv[]) {
 				CA_wind_speed = strtol(strtk, &strtol_err, 10);
                	_errno = errno;
 				if (*strtol_err != '\0') 
-					ERROR("Time must be integer!\n",1);
+					ERROR("Wind speed in meters per second expected!\n",1);
 				
 				if ((strtk = strtok(NULL, ",")) == NULL )
 					ERROR("You forgot to specify the angle of wind!\n",1);
 				if (strtok(NULL, ",") != NULL)
-					ERROR("Parameter -w contains too much values!\n",1);
+					ERROR("option -w contains too much values!\n",1);
 					
 				CA_wind_angle = strtol(strtk, &strtol_err, 10);
                	_errno = errno;
 				if (*strtol_err != '\0') 
-					ERROR("Time must be integer!\n",1);
+					ERROR("Angle in radians expected!\n",1);
 
 				CA_wind_angle = angles_to_radians(CA_wind_angle);
 				CA_eccentricity = CA_get_eccentricity();

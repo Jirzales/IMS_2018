@@ -59,7 +59,7 @@ typedef struct Cell{
     double fire[8] = {0,};
 } Cell;
 
-typedef struct{
+typedef struct {
     int id;
     Cell cell; 
 } cellF;
@@ -75,8 +75,8 @@ class CA {
 
         void set_distance(double dist);
         double get_deltaT(std::list<cellF> front);
-        void fire_expand(double ro, double deltaT, int x, int y, Cell& cell);
-        void cell_ingite();
+        void fire_expand(Cell& from_cell, double deltaT, int x, int y, Cell& to_cell);
+        void cell_ignite();
 		void initialize_CA_cells(std::ifstream& file, int width, int height);
 
     public:
@@ -85,7 +85,8 @@ class CA {
         ~CA();
 
 		void get_image_of_fire(int w, int h, char *name); 
-        int run();
+        void check_neighbours(cellF& cellf, int step, double deltaT);
+		int run();
         int get_size();
         
         // test functions
