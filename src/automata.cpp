@@ -41,7 +41,7 @@ CA::CA(char *csv) {
     for(int x = 0; x < CA_size; x++) {
 
         array[x] = new Cell[CA_size];
-		for (int y=0; y<CA_size; y++) {
+		for (int y = 0; y < CA_size; y++) {
 			array[x][y].x = x;
 			array[x][y].y = y;
 		}
@@ -65,7 +65,7 @@ CA::CA(char *csv) {
     set_distance(CA_cell_size);
 	
 	if (csv != NULL) {
-		//initialize_CA_cells(file, width, height);
+		initialize_CA_cells(file, width, height);
 		
 		file.close();
 	}
@@ -100,14 +100,13 @@ int CA::run(){
 */
 
 	element.cell = this->array[CA_size/2][CA_size/2];
-	element.cell.type = FIRE;
+	array[CA_size/2][CA_size/2].type = FIRE;
 	cell_front.push_back(element);
     
 	double deltaT = get_deltaT(cell_front);
 
     // Hlavni cyklus krokovani
     while(true) {
-cout << "gaga   ";
         // front runs out of ignited FIRE cells
         if(cell_front.empty()) {
             return(step);
@@ -115,7 +114,6 @@ cout << "gaga   ";
 
         if ((element = cell_front.front()).id > step){
             step = element.id;
-			
 			// Zjisteni zda se ma nehorici bunka podpalit
             cell_ignite(); 
 
@@ -133,7 +131,6 @@ cout << "gaga   ";
         }
 
 		check_neighbours(element, step, deltaT);
-
     }
     return 0;
 }
@@ -141,6 +138,7 @@ cout << "gaga   ";
 
 void CA::check_neighbours(cellF& cellf, int step ,double deltaT) {
 	cellF pom;
+    bool endfire;
 
     // Vyhozeni pouzite nastene bunky z fronty
     cell_front.pop_front();
@@ -149,19 +147,43 @@ void CA::check_neighbours(cellF& cellf, int step ,double deltaT) {
 	for(int y = -1; y < 2; y++){
 		for(int x = -1; x < 2; x++){
 			pom.cell = array[cellf.cell.x + x][cellf.cell.y + y];
-	
+
 			if (pom.cell.type == NONIGNITED){
-				fire_expand(cellf.cell, deltaT, x, y, pom.cell);
+				fire_expand(pom.cell, deltaT, x, y);
+                pom.id = step + 1;
 				cell_front_nonig.push_back(pom);
 			}
 	
-			//array[element.cell.x + i][element.cell.y + j] okoli soucasne bunky
 			if(pom.cell.type == FIRE){
-				pom.id = step + 1;
-				cell_front.push_back(pom); // Ulozeni horici bunky
+                if (x == 0 && y == 0){
+                    endfire = turn_off(pom);
+                }
+
+                if (!endfire){
+				    pom.id = step + 1;
+				    cell_front.push_back(pom); // Ulozeni horici bunky
+                }
 			}
 		}
 	}
+}
+
+bool CA::turn_off(cellF& cellf){
+    int ch = 0; 
+
+    for(int y = -1; y < 2; y++){
+        for(int x = -1; x < 2; x++){    
+            if(array[cellf.cell.x + x][cellf.cell.y + y].type == FIRE || array[cellf.cell.x + x][cellf.cell.y + y].type == NONFLAMMABLE){
+                ch++;
+            }
+        }
+    }
+    if (ch == 9){
+        array[cellf.cell.x][cellf.cell.y].type = BURNED;
+        cout << "lol" << endl;
+        return true;
+    }
+    return false;
 }
 
 
@@ -229,48 +251,53 @@ double CA::get_deltaT(std::list<cellF> front){
         pom_front.push_back(front.front());
         front.pop_front();
     }
-cout << "what is: " << CA_cell_size/ro<< endl;
     cell_front = pom_front;
     return CA_cell_size / ro;
 }
 
-void CA::fire_expand(Cell& from_cell, double deltaT, int x, int y, Cell& to_cell){
-cout << CA_R(from_cell, 2.35619) * deltaT;
-
+void CA::fire_expand(Cell& from_cell, double deltaT, int x, int y){
     switch(x){
         case -1:
             switch(y){
                 case -1:
-                    to_cell.fire[0] += CA_R(from_cell, 2.35619) * deltaT;
+                array[from_cell.x][from_cell.y].fire[0] += RO_TR * deltaT;
+                    //array[from_cell.x][from_cell.y].fire[0] += CA_R(from_cell, 2.35619) * deltaT;
                     return;
                 case 0:
-                    to_cell.fire[1] += CA_R(from_cell, 3.14159) * deltaT;
+                array[from_cell.x][from_cell.y].fire[1] += RO_TR * deltaT;
+                    //array[from_cell.x][from_cell.y].fire[1] += CA_R(from_cell, 3.14159) * deltaT;
                     return;
                 case 1:
-                    to_cell.fire[2] += CA_R(from_cell, 3.92699) * deltaT;
+                array[from_cell.x][from_cell.y].fire[2] += RO_TR * deltaT;
+                    //array[from_cell.x][from_cell.y].fire[2] += CA_R(from_cell, 3.92699) * deltaT;
                     return;
 
             }
         case 0:
             switch(y){
                 case -1:
-                    to_cell.fire[3] += CA_R(from_cell, 1.57079) * deltaT;
+                array[from_cell.x][from_cell.y].fire[3] += RO_TR * deltaT;
+                //    array[from_cell.x][from_cell.y].fire[3] += CA_R(from_cell, 1.57079) * deltaT;
                     return;
                 case 1:
-                    to_cell.fire[4] += CA_R(from_cell, 4.71238) * deltaT;
+                array[from_cell.x][from_cell.y].fire[4] += RO_TR * deltaT;
+                  //  array[from_cell.x][from_cell.y].fire[4] += CA_R(from_cell, 4.71238) * deltaT;
                     return;
                 
             }
         case 1:
             switch(y){
                 case -1:
-                    to_cell.fire[5] += CA_R(from_cell, 0.78539) * deltaT;
+                array[from_cell.x][from_cell.y].fire[5] += RO_TR * deltaT;
+                    //array[from_cell.x][from_cell.y].fire[5] += CA_R(from_cell, 0.78539) * deltaT;
                     return;
                 case 0:
-                    to_cell.fire[6] += CA_R(from_cell, 0.) * deltaT;
+                array[from_cell.x][from_cell.y].fire[6] += RO_TR * deltaT;
+                    //array[from_cell.x][from_cell.y].fire[6] += CA_R(from_cell, 0.) * deltaT;
                     return;
                 case 1:
-                    to_cell.fire[7] += CA_R(from_cell, 5.49778) * deltaT;
+                array[from_cell.x][from_cell.y].fire[7] += RO_TR * deltaT;
+                    //array[from_cell.x][from_cell.y].fire[7] += CA_R(from_cell, 5.49778) * deltaT;
                     return;
                 
             }
@@ -284,16 +311,19 @@ void CA::cell_ignite(){
     while(!cell_front_nonig.empty()){
         pom_cell = cell_front_nonig.front().cell;
         for (int i = 0; i < 8; i++){
-            if (pom_cell.fire[i] > distance[i]){
-                pom_cell.type = FIRE; 
+            if (array[pom_cell.x][pom_cell.y].fire[i] > distance[i]){ 
+                array[pom_cell.x][pom_cell.y].type = FIRE; 
+                cout << "here" << endl;
                 break;
             }
-
-            cell_sum += pom_cell.fire[i];
+            cout << pom_cell.fire[i];
+            cell_sum += array[pom_cell.x][pom_cell.y].fire[i];
         }
 
+        cout << cell_sum << endl;
         if (distance_sum / 2 < cell_sum){
-            pom_cell.type = FIRE;
+            cout << "ad" << endl;
+            array[pom_cell.x][pom_cell.y].type = FIRE;
         }
 
         cell_front_nonig.pop_front();

@@ -73,9 +73,10 @@ class CA {
         double distance_sum = 0;
         Cell** array;
 
+        bool turn_off(cellF& cellf);
         void set_distance(double dist);
         double get_deltaT(std::list<cellF> front);
-        void fire_expand(Cell& from_cell, double deltaT, int x, int y, Cell& to_cell);
+        void fire_expand(Cell& from_cell, double deltaT, int x, int y);
         void cell_ignite();
 		void initialize_CA_cells(std::ifstream& file, int width, int height);
 
